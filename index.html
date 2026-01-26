@@ -812,6 +812,32 @@ const SUPABASE_URL = "https://mjmqqomefxdpqugwvesg.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qbXFxb21lZnhkcHF1Z3d2ZXNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxODAxMjUsImV4cCI6MjA4NDc1NjEyNX0.ZBPrtLp1LV-XiwAb6YdQTcfLlBUTpznK7c5vb0Pd8QQ";
 
 const CLUB_NAME = "Rudar Kostolac";
+function cleanTeamName(name){
+let s = String(name || "").trim().replace(/\s+/g, " ");
+if(!s) return "";
+
+const kill = ["FK","OFK","GFK","SK","NK","FC","F.C.","ФК","ОФК"];
+let parts = s.split(" ");
+while(parts.length && kill.includes(parts[0].toUpperCase())){
+parts.shift();
+}
+return parts.join(" ").trim();
+}
+
+function teamParts(name){
+const full = cleanTeamName(name) || String(name || "").trim();
+let parts = full.split(/\s+/).filter(Boolean);
+
+// ako prvi token bude broj, preskoči (retko)
+while(parts.length && /^\d+$/.test(parts[0])) parts.shift();
+
+const short = parts[0] || full;
+return { full, short };
+}
+
+function sameTeam(a,b){
+return cleanTeamName(a).toLowerCase() === cleanTeamName(b).toLowerCase();
+}
 
 function formatDateISO(iso){
 const s = String(iso || "");
@@ -911,7 +937,22 @@ if(normClubName(home) === club) return {t:"KOD KUĆE", cls:"home"};
 if(normClubName(away) === club) return {t:"GOSTI", cls:""};
 return {t:"", cls:""};
 }
+function shortClubName(name){
+return String(name || "")
+.replace(/\b(FK|OFK|SK|NK)\b\.?/gi, "")
+.split(/[-–•|]/)[0]
+.trim()
+.split(/\s+/)
+.slice(0, 2)
+.join(" ");
+}
 
+function displayClubName(name){
+if(window.innerWidth <= 520){
+return shortClubName(name);
+}
+return String(name || "");
+}
 function matchCard(m){
 const date = formatDateISO(m.match_date);
 const time = m.match_time || "";
