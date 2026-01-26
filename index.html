@@ -22,7 +22,8 @@
 --shadow: 0 18px 60px rgba(0,0,0,.45);
 --r1:18px;
 --max:1180px;
---tickerSeconds: 54s; 
+--tickerSeconds: 54s; /* veći broj = sporije */
+}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -775,7 +776,7 @@ Admin radi samo kad je online verzija sa Netlify function (/.netlify/functions/a
 
 <script>
 const SUPABASE_URL = "https://mjmqqomefxdpqugwvesg.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qbXFxb21lZnhkcHF1Z3d2ZXNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxODAxMjUsImV4cCI6MjA4NDc1NjEyNX0.ZBPrtLp1LV-XiwAb6YdQTcfLlBUTpznK7c5vb0Pd8QQ";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qbXFxb21lZnhkcHF1Z3d2ZXNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxODAxMjUsImV4cCI6MjA4NDc1NjEyNX0.ZBPrtLp1LV-XiwAb6YdQTcfLlBUTpznK7c5vb0Pd8QQ"
 
 const CLUB_NAME = "Rudar Kostolac";
 
