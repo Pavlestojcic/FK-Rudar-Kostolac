@@ -133,6 +133,7 @@ border-radius:999px;
 background: rgba(25,197,107,.10);
 font-weight:950; letter-spacing:.3px;
 font-size:12px; white-space:nowrap;
+
 }
 .dot{
 width:8px; height:8px; border-radius:99px;
@@ -459,7 +460,25 @@ line-height:1.15;
 }
 
 .vs strong{font-size:12px}
+@media (max-width: 520px){
+  .ticker-badge{
+    padding: 6px 8px;
+    font-size: 11px;
+    gap: 8px;
+  }
+  .dot{
+    width: 6px;
+    height: 6px;
+    box-shadow: 0 0 0 4px rgba(14,224,138,.10);
+  }
+  .tick{
+    padding: 8px 10px;
+    font-size: 11px;
+    gap: 8px;
+  }
+  .tick small{ font-size: 10px; }
 }
+
 </style>
 </head>
 
@@ -471,7 +490,7 @@ line-height:1.15;
 <img src="assets/img/rudar_logo_transparent.png" alt="FK Rudar logo" />
 <div>
 <div class="t1">FK RUDAR KOSTOLAC</div>
-<div class="t2">Zona Dunav • Zona Dunav</div>
+<div class="t2">Zona Dunav </div>
 </div>
 </div>
 
