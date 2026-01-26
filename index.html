@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>FK Rudar Kostolac</title>
 <meta name="description" content="FK Rudar Kostolac | Zvanična klupska stranica" />
-<link rel="icon" type="image/png" href="/assets/img/rudar_logo_transparent.png">
+
+<!-- FAVICON (ikonica taba) -->
+<link rel="icon" type="image/png" href="assets/img/rudar_logo_transparent.png">
+
 <style>
 :root{
 --bg:#050907;
@@ -19,8 +22,7 @@
 --shadow: 0 18px 60px rgba(0,0,0,.45);
 --r1:18px;
 --max:1180px;
---tickerSeconds: 54s; /* veći broj = sporije */
-}
+--tickerSeconds: 54s; 
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -427,24 +429,35 @@ font-size:12px;
 .home-grid{grid-template-columns: 1fr}
 .players{grid-template-columns: repeat(2, 1fr)}
 }
+
+/* OPTIMIZACIJA ZA TELEFON */
 @media (max-width: 520px){
 .players{grid-template-columns: 1fr}
-.match{grid-template-columns: 82px 1fr}
-.match .tag{display:none}
-.club .n{max-width: 20ch}
-.kontakt-lista {
-  display: grid;
-  gap: 10px;
-  margin-top: 12px;
+
+.match{
+grid-template-columns: 74px 1fr;
+gap:10px;
+padding:10px 10px;
 }
 
-.kontakt-item {
-  display: block;
-  padding: 12px 14px;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 10px;
-  text-decoration: none;
-  color: inherit;
+.when b{font-size:12px}
+.when span{font-size:10px}
+
+.match .tag{display:none}
+
+.club .n{
+max-width:none;
+white-space:normal;
+overflow:visible;
+text-overflow:unset;
+display:-webkit-box;
+-webkit-line-clamp:2;
+-webkit-box-orient:vertical;
+font-size:13px;
+line-height:1.15;
+}
+
+.vs strong{font-size:12px}
 }
 </style>
 </head>
@@ -454,7 +467,7 @@ font-size:12px;
 <div class="wrap">
 <div class="topbar-inner">
 <div class="brand">
-<img src="/assets/img/rudar_logo_transparent.png" alt="FK Rudar logo" />
+<img src="assets/img/rudar_logo_transparent.png" alt="FK Rudar logo" />
 <div>
 <div class="t1">FK RUDAR KOSTOLAC</div>
 <div class="t2">Zona Dunav • Zeleno crna</div>
@@ -575,6 +588,7 @@ font-size:12px;
 <div class="hint" id="tableNote"></div>
 </div>
 </div>
+</div>
 </section>
 
 <section class="view" id="viewSchedule">
@@ -601,6 +615,7 @@ font-size:12px;
 <div class="card view-pad">
 <div class="section-head" style="margin:0 0 10px">
 <h2>Tim</h2>
+<p>Slike: assets/players/ime_prezime_broj.png ili .jpg</p>
 </div>
 <div id="teamGroups"></div>
 </div>
@@ -663,42 +678,12 @@ Facebook
 </div>
 </div>
 </div>
-<a class="cbtn" href="tel:+381628020224">
-  <span class="iconbtn">
-    <svg class="icon" viewBox="0 0 24 24" fill="none">
-      <path d="M6.6 10.7c1.4 2.8 3.9 5.3 6.7 6.7l2.2-2.2c.3-.3.7-.4 1.1-.3 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.3 22 2 13.7 2 3c0-.6.4-1 1-1h3.9c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1l-2.2 2.2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    Predsednik Nenad Stojcic: 062 802 0224
-  </span>
-  <small>Pozovi</small>
-</a>
 
-<a class="cbtn" href="tel:+381641874384">
-  <span class="iconbtn">
-    <svg class="icon" viewBox="0 0 24 24" fill="none">
-      <path d="M6.6 10.7c1.4 2.8 3.9 5.3 6.7 6.7l2.2-2.2c.3-.3.7-.4 1.1-.3 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.3 22 2 13.7 2 3c0-.6.4-1 1-1h3.9c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1l-2.2 2.2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    Saša Kostić:064 187 4384
-  </span>
-  <small>Pozovi</small>
-</a>
-
-<a class="cbtn" href="tel:+381628003230">
-  <span class="iconbtn">
-    <svg class="icon" viewBox="0 0 24 24" fill="none">
-      <path d="M6.6 10.7c1.4 2.8 3.9 5.3 6.7 6.7l2.2-2.2c.3-.3.7-.4 1.1-.3 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.3 22 2 13.7 2 3c0-.6.4-1 1-1h3.9c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1l-2.2 2.2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    062 800 3230
-  </span>
-  <small>Pozovi</small>
-</a>
 <div class="modal" id="adminModal" aria-hidden="true">
 <div class="modal-card" role="dialog" aria-modal="true">
 <div class="modal-head">
 <b>Admin</b>
 <button class="modal-close" id="adminClose">✕</button>
-
-
 </div>
 
 <div class="modal-body">
@@ -782,6 +767,7 @@ Facebook
 </div>
 
 <div class="hint" style="margin-top:12px">
+Admin radi samo kad je online verzija sa Netlify function (/.netlify/functions/admin).
 </div>
 </div>
 </div>
@@ -814,6 +800,17 @@ return String(text || "")
 function playerImgByRule(fullName, number){
 const base = `assets/players/${toSlug(fullName)}_${number}`;
 return { png: `${base}.png`, jpg: `${base}.jpg` };
+}
+
+/* TELEFON: skrati FK/OFK itd. */
+function shortClubName(name){
+return String(name || "")
+.replace(/\b(FK|OFK|SK|NK)\b\.?/gi, "")
+.replace(/\s+/g, " ")
+.trim();
+}
+function normClubName(name){
+return shortClubName(name).toLowerCase();
 }
 
 async function supaGet(path){
@@ -875,8 +872,9 @@ showView(id);
 });
 
 function matchBadge(home, away){
-if(home === CLUB_NAME) return {t:"KOD KUĆE", cls:"home"};
-if(away === CLUB_NAME) return {t:"GOSTI", cls:""};
+const club = normClubName(CLUB_NAME);
+if(normClubName(home) === club) return {t:"KOD KUĆE", cls:"home"};
+if(normClubName(away) === club) return {t:"GOSTI", cls:""};
 return {t:"", cls:""};
 }
 
@@ -895,9 +893,9 @@ return `
 </div>
 
 <div class="vs">
-<div class="club"><div class="n">${m.home_team}</div></div>
+<div class="club"><div class="n">${shortClubName(m.home_team)}</div></div>
 <strong style="color:var(--green2); font-weight:950">vs</strong>
-<div class="club" style="justify-content:flex-end"><div class="n">${m.away_team}</div></div>
+<div class="club" style="justify-content:flex-end"><div class="n">${shortClubName(m.away_team)}</div></div>
 </div>
 
 <div class="tag ${b.cls}">${tagText}</div>
@@ -936,7 +934,7 @@ return `
 <span class="tick">
 <small>${date} ${time}</small>
 <strong>${label}</strong>
-<span>${m.home_team} vs ${m.away_team}</span>
+<span>${shortClubName(m.home_team)} vs ${shortClubName(m.away_team)}</span>
 </span>
 `;
 }).join("");
