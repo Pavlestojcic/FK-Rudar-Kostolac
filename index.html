@@ -22,7 +22,7 @@
 --shadow: 0 18px 60px rgba(0,0,0,.45);
 --r1:18px;
 --max:1180px;
---tickerSeconds: 47s; /* veći broj = sporije */
+--tickerSeconds: 54s; /* veći broj = sporije */
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -133,7 +133,6 @@ border-radius:999px;
 background: rgba(25,197,107,.10);
 font-weight:950; letter-spacing:.3px;
 font-size:12px; white-space:nowrap;
-
 }
 .dot{
 width:8px; height:8px; border-radius:99px;
@@ -460,25 +459,7 @@ line-height:1.15;
 }
 
 .vs strong{font-size:12px}
-@media (max-width: 520px){
-  .ticker-badge{
-    padding: 6px 8px;
-    font-size: 11px;
-    gap: 8px;
-  }
-  .dot{
-    width: 6px;
-    height: 6px;
-    box-shadow: 0 0 0 4px rgba(14,224,138,.10);
-  }
-  .tick{
-    padding: 8px 10px;
-    font-size: 11px;
-    gap: 8px;
-  }
-  .tick small{ font-size: 10px; }
 }
-
 </style>
 </head>
 
@@ -490,7 +471,7 @@ line-height:1.15;
 <img src="assets/img/rudar_logo_transparent.png" alt="FK Rudar logo" />
 <div>
 <div class="t1">FK RUDAR KOSTOLAC</div>
-<div class="t2">Zona Dunav </div>
+<div class="t2">Zona Dunav • Zeleno crna</div>
 </div>
 </div>
 
@@ -635,6 +616,7 @@ line-height:1.15;
 <div class="card view-pad">
 <div class="section-head" style="margin:0 0 10px">
 <h2>Tim</h2>
+<p>Slike: assets/players/ime_prezime_broj.png ili .jpg</p>
 </div>
 <div id="teamGroups"></div>
 </div>
@@ -649,7 +631,6 @@ line-height:1.15;
 
 <div class="contact">
 <a class="cbtn" href="https://www.instagram.com/fkrudarkostolac/" target="_blank" rel="noopener">
-
 <span class="iconbtn">
 <svg class="icon" viewBox="0 0 24 24" fill="none">
 <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Z" stroke="currentColor" stroke-width="2"/>
@@ -669,20 +650,6 @@ Instagram
 Facebook
 </span>
 <small>FK Rudar Kostolac</small>
-</a>
-<a class="cbtn" href="tel:+381628020224">
-  <span class="iconbtn">Predsednik Nenad Stojčić</span>
-  <small>062 802 0224</small>
-</a>
-
-<a class="cbtn" href="tel:+381641874384">
-  <span class="iconbtn">Saša Kostić</span>
-  <small>064 187 4384</small>
-</a>
-
-<a class="cbtn" href="tel:+381628003230">
-  <span class="iconbtn">Kontakt</span>
-  <small>062 800 3230</small>
 </a>
 </div>
 </div>
@@ -808,36 +775,10 @@ Admin radi samo kad je online verzija sa Netlify function (/.netlify/functions/a
 </div>
 
 <script>
-const SUPABASE_URL = "https://mjmqqomefxdpqugwvesg.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qbXFxb21lZnhkcHF1Z3d2ZXNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxODAxMjUsImV4cCI6MjA4NDc1NjEyNX0.ZBPrtLp1LV-XiwAb6YdQTcfLlBUTpznK7c5vb0Pd8QQ";
+const SUPABASE_URL = "PASTE_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "PASTE_SUPABASE_ANON_KEY";
 
 const CLUB_NAME = "Rudar Kostolac";
-function cleanTeamName(name){
-let s = String(name || "").trim().replace(/\s+/g, " ");
-if(!s) return "";
-
-const kill = ["FK","OFK","GFK","SK","NK","FC","F.C.","ФК","ОФК"];
-let parts = s.split(" ");
-while(parts.length && kill.includes(parts[0].toUpperCase())){
-parts.shift();
-}
-return parts.join(" ").trim();
-}
-
-function teamParts(name){
-const full = cleanTeamName(name) || String(name || "").trim();
-let parts = full.split(/\s+/).filter(Boolean);
-
-// ako prvi token bude broj, preskoči (retko)
-while(parts.length && /^\d+$/.test(parts[0])) parts.shift();
-
-const short = parts[0] || full;
-return { full, short };
-}
-
-function sameTeam(a,b){
-return cleanTeamName(a).toLowerCase() === cleanTeamName(b).toLowerCase();
-}
 
 function formatDateISO(iso){
 const s = String(iso || "");
@@ -937,22 +878,7 @@ if(normClubName(home) === club) return {t:"KOD KUĆE", cls:"home"};
 if(normClubName(away) === club) return {t:"GOSTI", cls:""};
 return {t:"", cls:""};
 }
-function shortClubName(name){
-return String(name || "")
-.replace(/\b(FK|OFK|SK|NK)\b\.?/gi, "")
-.split(/[-–•|]/)[0]
-.trim()
-.split(/\s+/)
-.slice(0, 2)
-.join(" ");
-}
 
-function displayClubName(name){
-if(window.innerWidth <= 520){
-return shortClubName(name);
-}
-return String(name || "");
-}
 function matchCard(m){
 const date = formatDateISO(m.match_date);
 const time = m.match_time || "";
