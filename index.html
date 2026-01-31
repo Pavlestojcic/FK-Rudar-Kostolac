@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>FK Rudar Kostolac</title>
 <meta name="description" content="FK Rudar Kostolac | Zvanična klupska stranica" />
-
 <link rel="icon" type="image/png" href="assets/img/rudar_logo_transparent.png">
 
 <style>
@@ -22,7 +21,8 @@
 --r1:18px;
 --max:1180px;
 --tickerSeconds: 47s;
---headerH: 72px;
+--headerH: 74px;
+--tickerH: 54px;
 }
 
 *{box-sizing:border-box}
@@ -37,12 +37,12 @@ radial-gradient(900px 650px at 70% 90%, rgba(25,197,107,.10), transparent 60%),
 linear-gradient(180deg, #050907 0%, #030604 100%);
 color:var(--text);
 overflow-x:hidden;
-padding-top: var(--headerH);
+padding-top: calc(var(--headerH) + var(--tickerH));
 }
 a{color:inherit; text-decoration:none}
 .wrap{max-width:var(--max); margin:0 auto; padding:0 18px}
 
-/* HEADER UVEK GORE */
+/* HEADER FIXED */
 .topbar{
 position:fixed; top:0; left:0; right:0; z-index:60;
 background: rgba(5,9,7,.74);
@@ -57,7 +57,6 @@ padding:12px 0;
 .brand{
 display:flex; align-items:center; gap:12px; min-width:220px;
 cursor:pointer;
-user-select:none;
 }
 .brand img{
 width:44px; height:44px; object-fit:contain;
@@ -96,48 +95,15 @@ background: var(--text); opacity:.9;
 .ham-lines span:nth-child(2){top:5px; opacity:.75}
 .ham-lines span:nth-child(3){bottom:0; opacity:.9}
 
-/* DRAWER */
-.drawer{position:fixed; inset:0; background: rgba(0,0,0,.58); display:none; z-index:120}
-.drawer.open{display:block}
-.drawer-panel{
-position:absolute; top:0; right:0;
-width:min(390px, 92vw); height:100%;
-background: rgba(11,18,14,.92);
-backdrop-filter: blur(16px);
-border-left:1px solid rgba(233,243,236,.12);
-padding:16px;
-display:flex; flex-direction:column; gap:12px;
-}
-.drawer-head{
-display:flex; align-items:center; justify-content:space-between; gap:10px;
-padding-bottom:10px; border-bottom:1px solid rgba(233,243,236,.10);
-}
-.drawer-title{font-weight:950; letter-spacing:.5px}
-.drawer-close{
-width:40px; height:40px; border-radius:14px;
-border:1px solid rgba(233,243,236,.14);
-background: rgba(15,26,20,.72);
-color:var(--text); cursor:pointer;
-display:flex; align-items:center; justify-content:center;
-}
-.drawer-links{display:flex; flex-direction:column; gap:8px; padding-top:8px; overflow:auto}
-.drawer-links button{
-display:flex; align-items:center; justify-content:space-between; gap:10px;
-padding:12px 12px; border-radius:16px;
-border:1px solid rgba(233,243,236,.10);
-background: rgba(15,26,20,.55);
-color:var(--text);
-font-weight:950; letter-spacing:.2px;
-cursor:pointer; text-align:left;
-}
-.drawer-links button span{color:var(--muted); font-weight:900; font-size:12px}
-
-/* TICKER */
+/* TICKER FIXED */
 .ticker{
+position:fixed;
+top: var(--headerH);
+left:0; right:0;
+z-index:55;
 border-bottom:1px solid var(--line);
 background: rgba(0,0,0,.25);
 overflow:hidden;
-margin-top: 0;
 }
 .ticker-inner{display:flex; align-items:center; gap:14px; padding:10px 0}
 .ticker-badge{
@@ -240,22 +206,13 @@ background: rgba(15,26,20,.45);
 .when{display:flex; flex-direction:column; gap:3px}
 .when b{font-weight:950; letter-spacing:.2px; font-size:13px}
 .when span{color:var(--muted); font-weight:900; font-size:11px}
-
-/* VS PORAVNANJE */
-.vs{
-display:grid;
-grid-template-columns: 1fr auto 1fr;
-align-items:center;
-gap:10px;
-min-width:0;
-}
-.teamL{min-width:0; text-align:left}
-.teamR{min-width:0; text-align:right}
-.teamName{
+.vs{display:flex; align-items:center; justify-content:space-between; gap:10px; min-width:0}
+.club{display:flex; align-items:center; gap:10px; min-width:0}
+.club .n{
 font-weight:950; letter-spacing:.2px;
 white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+max-width: 34ch;
 }
-
 .tag{
 padding:7px 10px; border-radius:999px;
 border:1px solid rgba(233,243,236,.12);
@@ -315,16 +272,16 @@ padding:7px 10px; border-radius:999px;
 }
 .news-item p{margin:0; opacity:.92; font-weight:800; line-height:1.5}
 
-/* SLIKA VESTI: NE RAZVLACI, PRILAGODI */
+/* SLIKE U VESTI: NE RAZVLAČI */
 .news-img{
 width:100%;
-max-height:520px;
+max-height:340px;
 object-fit:contain;
+background: rgba(0,0,0,.22);
 border-radius:14px;
 border:1px solid rgba(233,243,236,.10);
 margin:10px 0;
 display:block;
-background: rgba(0,0,0,.18);
 }
 
 details.group{
@@ -386,6 +343,41 @@ font-weight:950; letter-spacing:.2px;
 .cbtn small{color:var(--muted); font-weight:900; font-size:12px}
 .iconbtn{display:inline-flex; align-items:center; gap:10px}
 
+.drawer{position:fixed; inset:0; background: rgba(0,0,0,.58); display:none; z-index:120}
+.drawer.open{display:block}
+.drawer-panel{
+position:absolute; top:0; right:0;
+width:min(390px, 92vw); height:100%;
+background: rgba(11,18,14,.92);
+backdrop-filter: blur(16px);
+border-left:1px solid rgba(233,243,236,.12);
+padding:16px;
+display:flex; flex-direction:column; gap:12px;
+}
+.drawer-head{
+display:flex; align-items:center; justify-content:space-between; gap:10px;
+padding-bottom:10px; border-bottom:1px solid rgba(233,243,236,.10);
+}
+.drawer-title{font-weight:950; letter-spacing:.5px}
+.drawer-close{
+width:40px; height:40px; border-radius:14px;
+border:1px solid rgba(233,243,236,.14);
+background: rgba(15,26,20,.72);
+color:var(--text); cursor:pointer;
+display:flex; align-items:center; justify-content:center;
+}
+.drawer-links{display:flex; flex-direction:column; gap:8px; padding-top:8px; overflow:auto}
+.drawer-links button{
+display:flex; align-items:center; justify-content:space-between; gap:10px;
+padding:12px 12px; border-radius:16px;
+border:1px solid rgba(233,243,236,.10);
+background: rgba(15,26,20,.55);
+color:var(--text);
+font-weight:950; letter-spacing:.2px;
+cursor:pointer; text-align:left;
+}
+.drawer-links button span{color:var(--muted); font-weight:900; font-size:12px}
+
 .modal{position:fixed; inset:0; display:none; z-index:140; background: rgba(0,0,0,.62); padding:16px}
 .modal.open{display:flex}
 .modal-card{
@@ -414,6 +406,7 @@ max-height: calc(100vh - 140px);
 overflow: auto;
 -webkit-overflow-scrolling: touch;
 }
+
 .row2{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
 .field{display:flex; flex-direction:column; gap:6px; margin-top:10px}
 .field label{font-size:12px; color:var(--muted); font-weight:950; letter-spacing:.2px}
@@ -458,43 +451,23 @@ font-size:12px;
 
 @media (max-width: 520px){
 .players{grid-template-columns: 1fr}
-
-.match{
-grid-template-columns: 74px 1fr;
-gap:10px;
-padding:10px 10px;
-}
-
+.match{grid-template-columns: 74px 1fr; gap:10px; padding:10px 10px;}
 .when b{font-size:12px}
 .when span{font-size:10px}
 .match .tag{display:none}
-
-.teamName{
-white-space:normal;
+.club .n{
+max-width:none;
+white-space:nowrap;
 overflow:hidden;
-text-overflow:unset;
-display:-webkit-box;
--webkit-line-clamp:2;
--webkit-box-orient:vertical;
+text-overflow:ellipsis;
 font-size:13px;
 line-height:1.15;
 }
+.vs strong{font-size:12px}
 
-.ticker-badge{
-padding: 6px 8px;
-font-size: 11px;
-gap: 8px;
-}
-.dot{
-width: 6px;
-height: 6px;
-box-shadow: 0 0 0 4px rgba(14,224,138,.10);
-}
-.tick{
-padding: 8px 10px;
-font-size: 11px;
-gap: 8px;
-}
+.ticker-badge{padding: 6px 8px; font-size: 11px; gap: 8px;}
+.dot{width: 6px; height: 6px; box-shadow: 0 0 0 4px rgba(14,224,138,.10);}
+.tick{padding: 8px 10px; font-size: 11px; gap: 8px;}
 .tick small{ font-size: 10px; }
 }
 </style>
@@ -504,7 +477,7 @@ gap: 8px;
 <header class="topbar">
 <div class="wrap">
 <div class="topbar-inner">
-<div class="brand" id="brandBtn" title="Početna">
+<div class="brand" id="brandHome" title="Početna">
 <img src="assets/img/rudar_logo_transparent.png" alt="FK Rudar logo" />
 <div>
 <div class="t1">FK RUDAR KOSTOLAC</div>
@@ -550,7 +523,7 @@ gap: 8px;
 <section class="view active" id="viewHome">
 <div class="hero">
 <div class="card hero-main">
-<img class="hero-img" src="stadion.jpg" alt="Stadion" onerror="this.style.display='none'"/>
+<img class="hero-img" src="stadion.jpg" alt="Stadion" onerror="this.style.display='none'" />
 <div class="hero-overlay"></div>
 <div class="hero-content">
 <div class="kickers">
@@ -559,7 +532,7 @@ gap: 8px;
 <div class="pill">Šef stručnog štaba: Novica Gajić</div>
 </div>
 <h1>FK Rudar Kostolac</h1>
-<div class="sub">Naredne 3. Najnovija vest. Tabela na dnu.</div>
+<div class="sub">Naredne 3 utakmice. Najnovija vest. Tabela na dnu.</div>
 </div>
 </div>
 
@@ -578,7 +551,7 @@ gap: 8px;
 <div class="card matches-card">
 <div class="section-head" style="margin:0 0 6px">
 <h2>Naredne 3</h2>
-<p>Zona Dunav + ostalo</p>
+<p>Raspored</p>
 </div>
 <div class="match-list" id="nextMatches"></div>
 </div>
@@ -586,7 +559,7 @@ gap: 8px;
 <div class="card matches-card">
 <div class="section-head" style="margin:0 0 6px">
 <h2>Najnovija vest</h2>
-<p>Zvanične objave</p>
+<p>Objave</p>
 </div>
 <div class="news-item" style="margin-top:10px">
 <h3 id="homeNewsTitle"></h3>
@@ -657,6 +630,19 @@ gap: 8px;
 </div>
 </section>
 
+<section class="view" id="viewHistory">
+<div class="card view-pad">
+<div class="section-head" style="margin:0 0 10px">
+<h2>Istorija</h2>
+<p>Klub</p>
+</div>
+<div class="news-item">
+<h3>FK Rudar Kostolac</h3>
+<p id="historyText"></p>
+</div>
+</div>
+</section>
+
 <section class="view" id="viewContact">
 <div class="card view-pad">
 <div class="section-head" style="margin:0 0 10px">
@@ -705,20 +691,6 @@ Facebook
 </div>
 </section>
 
-<section class="view" id="viewHistory">
-<div class="card view-pad">
-<div class="section-head" style="margin:0 0 10px">
-<h2>Istorija</h2>
-<p>Klub</p>
-</div>
-<div id="historyBox" class="news-item">
-<h3>Istorija kluba</h3>
-<p>Učitaj istoriju iz baze…</p>
-</div>
-<div class="hint" id="historyHint"></div>
-</div>
-</section>
-
 <footer>
 <div class="wrap">FK Rudar Kostolac • Zona Dunav</div>
 </footer>
@@ -738,8 +710,8 @@ Facebook
 <button data-view="viewSchedule">Raspored <span>utakmice</span></button>
 <button data-view="viewNews">Vesti <span>objave</span></button>
 <button data-view="viewTeam">Tim <span>igrači</span></button>
+<button data-view="viewHistory">Istorija <span></span></button>
 <button data-view="viewContact">Kontakt <span>mreže</span></button>
-<button data-view="viewHistory">Istorija <span>klub</span></button>
 <button id="adminMenuBtn">Admin <span>PIN</span></button>
 </div>
 </div>
@@ -788,8 +760,8 @@ Facebook
 <div class="field"><label>Vreme</label><input id="mTime" placeholder="14:30" /></div>
 </div>
 <div class="row2">
-<div class="field"><label>Domaćin</label><input id="mHome" placeholder="Pomoravlje 1946" /></div>
-<div class="field"><label>Gost</label><input id="mAway" placeholder="Rudar Kostolac" /></div>
+<div class="field"><label>Domaćin</label><input id="mHome" placeholder="Pomoravlje" /></div>
+<div class="field"><label>Gost</label><input id="mAway" placeholder="Rudar" /></div>
 </div>
 <div class="row2">
 <div class="field"><label>Takmičenje</label><input id="mComp" placeholder="Zona Dunav" /></div>
@@ -836,53 +808,106 @@ Facebook
 </div>
 
 <script>
+/* ==============================
+SUPABASE (FRONT READ)
+================================ */
 const SUPABASE_URL = "https://mjmqqomefxdpqugwvesg.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qbXFxb21lZnhkcHF1Z3d2ZXNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxODAxMjUsImV4cCI6MjA4NDc1NjEyNX0.ZBPrtLp1LV-XiwAb6YdQTcfLlBUTpznK7c5vb0Pd8QQ"; /* ostavi svoj anon key */
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qbXFxb21lZnhkcHF1Z3d2ZXNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxODAxMjUsImV4cCI6MjA4NDc1NjEyNX0.ZBPrtLp1LV-XiwAb6YdQTcfLlBUTpznK7c5vb0Pd8QQ";
+
 const CLUB_NAME = "Rudar Kostolac";
-function cleanTeamName(name){
-  let s = String(name || "").trim().replace(/\s+/g, " ");
-  if(!s) return "";
-  const kill = ["FK","OFK","GFK","SK","NK","FC","F.C.","ФК","ОФК"];
-  let parts = s.split(" ");
-  while(parts.length && kill.includes(parts[0].toUpperCase())){
-    parts.shift();
-  }
-  return parts.join(" ").trim();
+
+/* ==============================
+ISTORIJA (STATIČKI TEKST)
+================================ */
+const HISTORY_TEXT =
+`Fudbalski klub Rudar Kostolac osnovan je 6. avgusta 1933. godine, paralelno sa početkom intenzivnih rudarskih aktivnosti u Klenovniku i Kostolcu. Ime kluba direktno je vezano za rudarsku tradiciju regiona – „Rudar“ simbolizuje radnike rudnika koji su bili osnova zajednice i prvi igrači.
+Klub je najstariji, najpopularniji i najtrofejniji deo Sportskog društva „Rudar“. Posle Drugog svetskog rata (krajem 1940-ih) fudbalska sekcija se formalno organizuje uz gimnastičko društvo, i postaje nosilac sportskog života u Kostolcu. Rudar je bio inicijator izgradnje sportskih terena i osnivanja drugih sportova u gradu.
+Tokom decenija klub se takmičio u različitim rangovima:
+•  Lige Beogradske oblasti i Okružna liga Braničevskog okruga 
+•  Posavsko-podunavska zona,
+•  Prva i Druga srpska liga,
+•  Međurepublička liga – Sever,
+•  Druga savezna liga – Istok (najviši rang u 1990-ima, npr. sezone 1996/97 i 1997/98 gde je bio u gornjem delu tabele).
+Krajem 80-ih i početkom 90-ih Rudar je imao jednu od najjačih generacija u istoriji – igrači poput Apostolovića, Boškovića, Manojlovića, Removića, Ranđelovića  , Čogurića, Petrovića, Novkovića, Suvalića, Vasovića i Alimanovića ostavili su trag u lokalnom fudbalu.
+Danas se klub takmiči u Zoni Dunav (4. rang srpskog fudbala). Dom je stadion „Bora Beka“ (kapacitet oko 1.800 gledalaca). Boje su tradicionalno zelene i crne (ili crno-bele u nekim periodima). Rudar redovno obeležava slavu (Sveti Vasilije Ostroški), Dan rudara i ima vernu publiku iz rudarske zajednice, okolnih sela i grada.
+Rudar nije samo fudbalski tim – to je simbol zajedništva Kostolca, generacija koje su nosile dres sa ponosom, od rudarskih štrajkova do današnjih utakmica pred punim tribinama. Klub je iznedrio mnoge igrače, trenere i navijače koji su dali doprinos srpskom fudbalu.`;
+
+/* ==============================
+HELPERS: IMENA KLUBOVA
+- PC: puno ime bez FK/OFK...
+- Telefon: SAMO IME (bez godine)
+(Mladi Radnik ostaje 2 reči)
+================================ */
+function stripPrefixes(name){
+let s = String(name || "").trim().replace(/\s+/g, " ");
+if(!s) return "";
+const kill = ["FK","OFK","GFK","SK","NK","FC","F.C.","ФК","ОФК"];
+let parts = s.split(" ");
+while(parts.length && kill.includes(parts[0].toUpperCase())) parts.shift();
+return parts.join(" ").trim();
+}
+function stripNoise(name){
+// skini (T), [..], posle crte itd
+return String(name || "")
+.replace(/\(.*?\)/g, "")
+.replace(/\[.*?\]/g, "")
+.split(/[-–•|]/)[0]
+.trim()
+.replace(/\s+/g, " ");
 }
 
-function shortTeamMobile(name){
-  const full = cleanTeamName(name) || String(name || "").trim();
-  if(!full) return "";
-  const tokens = full.split(/\s+/).filter(Boolean);
-  const first = tokens[0] || full;
-  const year = tokens.find(t => /^\d{4}$/.test(t)) || "";
-  return year ? `${first} ${year}` : first;
+/* Telefon: samo ime, bez godine */
+function mobileClubName(name){
+let s = stripNoise(stripPrefixes(name));
+if(!s) return "";
+
+// normalizacije koje ti trebaju
+const low = s.toLowerCase();
+
+// Mladi Radnik ostaje 2 reči
+if(low.includes("mladi") && low.includes("radnik")) return "Mladi Radnik";
+
+// Šumadija (T) -> Sumadija
+if(low.includes("šumadija") || low.includes("sumadija")) return "Sumadija";
+
+// Karadjordje Topola -> Karadjordje
+if(low.includes("karadjordje") || low.includes("karađorđe")) return "Karadjordje";
+
+// Pomoravlje Vlaški / Morava Velika -> Pomoravlje / Morava
+if(low.startsWith("pomoravlje")) return "Pomoravlje";
+if(low.startsWith("morava")) return "Morava";
+
+// ostali: prva reč
+return s.split(" ")[0];
 }
-function displayTeamName(name){
-  const full = cleanTeamName(name);
-  if(!full) return "";
 
-  const year = (full.match(/\b(18\d{2}|19\d{2}|20\d{2})\b/) || [])[1];
-  const base = full
-    .replace(/\b(18\d{2}|19\d{2}|20\d{2})\b/g, "")
-    .replace(/\s+/g," ")
-    .trim();
-
-  if(window.innerWidth <= 520){
-    return year ? `${base} ${year}` : base;
-  }
-  return full;
+/* PC: puno ime (bez FK/OFK), ali ne seci ništa drugo */
+function desktopClubName(name){
+return stripNoise(stripPrefixes(name));
 }
 
+function displayClubName(name){
+if(window.innerWidth <= 520){
+return mobileClubName(name);
+}
+return desktopClubName(name);
 }
 
-/* --- Helpers --- */
+function norm(name){
+return stripNoise(stripPrefixes(name)).toLowerCase();
+}
+
+function sameTeam(a,b){
+return norm(a) === norm(b);
+}
+
 function formatDateISO(iso){
 const s = String(iso || "");
 const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 if(!m) return s || "";
 return `${m[3]}.${m[2]}.${m[1]}`;
 }
+
 function toSlug(text) {
 return String(text || "")
 .toLowerCase()
@@ -900,20 +925,9 @@ const base = `assets/players/${toSlug(fullName)}_${number}`;
 return { png: `${base}.png`, jpg: `${base}.jpg` };
 }
 
-/* Skini FK/OFK… i ostavi: prvo ime + godina (ako ima) */
-function shortTeam(name){
-let s = String(name||"").trim().replace(/\s+/g," ");
-s = s.replace(/\b(FK|OFK|GFK|SK|NK|FC|F\.C\.|ФК|ОФК)\b\.?/gi,"").trim();
-if(!s) return "";
-const year = (s.match(/\b(18|19|20)\d{2}\b/)||[])[0] || "";
-const first = s.split(" ")[0] || s;
-return (first + (year ? " " + year : "")).trim();
-}
-function normTeam(name){
-return shortTeam(name).toLowerCase();
-}
-
-/* --- Supabase --- */
+/* ==============================
+SUPABASE GET
+================================ */
 async function supaGet(path){
 const res = await fetch(SUPABASE_URL + path, {
 headers: {
@@ -924,18 +938,12 @@ headers: {
 });
 if(!res.ok){
 const t = await res.text().catch(()=> "");
-throw new Error(`Supabase error ${res.status}: ${t || "request failed"}`);
+throw new Error("Supabase read error: " + res.status + " " + t);
 }
 return res.json();
 }
-async function supaGetSafe(path){
-try{ return await supaGet(path); }
-catch(e){
-console.warn(String(e.message||e));
-return [];
-}
-}
 
+/* Admin (write) ide preko Netlify function */
 async function adminPost(payload){
 const res = await fetch("/.netlify/functions/admin", {
 method: "POST",
@@ -947,8 +955,10 @@ if(!res.ok || !data.ok) throw new Error(data.error || "Admin failed");
 return data;
 }
 
-/* --- Views --- */
-const views = ["viewHome","viewSchedule","viewNews","viewTeam","viewContact","viewHistory"];
+/* ==============================
+NAV / VIEWS
+================================ */
+const views = ["viewHome","viewSchedule","viewNews","viewTeam","viewHistory","viewContact"];
 function showView(id){
 views.forEach(v=>{
 const el = document.getElementById(v);
@@ -957,12 +967,10 @@ if(el) el.classList.toggle("active", v === id);
 window.scrollTo({top:0, behavior:"smooth"});
 }
 
-/* --- Header logo click -> Home --- */
-document.getElementById("brandBtn").addEventListener("click", ()=>{
-showView("viewHome");
-});
+/* Logo -> Početna */
+document.getElementById("brandHome").addEventListener("click", ()=> showView("viewHome"));
 
-/* Drawer open/close */
+/* Drawer */
 const drawer = document.getElementById("drawer");
 document.getElementById("hamBtn").addEventListener("click", ()=>{
 drawer.classList.add("open");
@@ -988,21 +996,23 @@ showView(id);
 }
 });
 
-/* Match badge */
+/* ==============================
+MATCH CARDS + TICKER
+================================ */
 function matchBadge(home, away){
-const club = normTeam(CLUB_NAME);
-if(normTeam(home) === club) return {t:"KOD KUĆE", cls:"home"};
-if(normTeam(away) === club) return {t:"GOSTI", cls:""};
+const club = norm(CLUB_NAME);
+if(norm(home) === club) return {t:"KOD KUĆE", cls:"home"};
+if(norm(away) === club) return {t:"GOSTI", cls:""};
 return {t:"", cls:""};
 }
 
-/* Match card */
 function matchCard(m){
 const date = formatDateISO(m.match_date);
 const time = m.match_time || "";
 const b = matchBadge(m.home_team, m.away_team);
 const small = [time, (m.competition||"Zona Dunav")].filter(Boolean).join(" • ");
 const tagText = b.t || (m.round || "");
+
 return `
 <div class="match">
 <div class="when">
@@ -1011,9 +1021,9 @@ return `
 </div>
 
 <div class="vs">
-<div class="teamL"><div class="teamName">${displayTeamName(m.home_team)}</div></div>
+<div class="club"><div class="n">${displayClubName(m.home_team)}</div></div>
 <strong style="color:var(--green2); font-weight:950">vs</strong>
-<div class="teamR"><div class="teamName">${displayTeamName(m.away_team)}</div></div>
+<div class="club" style="justify-content:flex-end"><div class="n">${displayClubName(m.away_team)}</div></div>
 </div>
 
 <div class="tag ${b.cls}">${tagText}</div>
@@ -1021,9 +1031,32 @@ return `
 `;
 }
 
-/* Table */
+function renderTicker(matches){
+const holder = document.getElementById("tickerMove");
+const items = (matches||[]).slice(0,10);
+
+const html = items.map(m=>{
+const date = formatDateISO(m.match_date) || "Uskoro";
+const time = m.match_time || "";
+const b = matchBadge(m.home_team, m.away_team);
+const label = b.t || (m.competition || "Utakmica");
+return `
+<span class="tick">
+<small>${date} ${time}</small>
+<strong>${label}</strong>
+<span>${displayClubName(m.home_team)} vs ${displayClubName(m.away_team)}</span>
+</span>
+`;
+}).join("");
+
+holder.innerHTML = html + html;
+}
+
+/* ==============================
+TABLE
+================================ */
 function tableRow(pos, row){
-const isClub = String(row.team||"") === CLUB_NAME;
+const isClub = sameTeam(row.team, CLUB_NAME);
 return `
 <tr class="${isClub ? "highlight" : ""}">
 <td class="pos">${pos}</td>
@@ -1040,28 +1073,13 @@ return `
 `;
 }
 
-/* Ticker */
-function renderTicker(matches){
-const holder = document.getElementById("tickerMove");
-const items = (matches||[]).slice(0,10);
-const html = items.map(m=>{
-const date = formatDateISO(m.match_date) || "Uskoro";
-const time = m.match_time || "";
-const b = matchBadge(m.home_team, m.away_team);
-const label = b.t || (m.competition || "Utakmica");
-return `
-<span class="tick">
-<small>${date} ${time}</small>
-<strong>${label}</strong>
-<span>${shortTeam(m.home_team)} vs ${shortTeam(m.away_team)}</span>
-</span>`;
-}).join("");
-holder.innerHTML = html + html;
-}
-
+/* ==============================
+NEWS
+================================ */
 function renderHomeNews(n){
 document.getElementById("homeNewsTitle").textContent = n?.title || "Nema vesti";
 document.getElementById("homeNewsDate").textContent = n?.created_at ? new Date(n.created_at).toLocaleString("sr-RS") : "";
+
 const img = document.getElementById("homeNewsImg");
 const src = String(n?.image_url || "").trim();
 if(src){
@@ -1070,14 +1088,15 @@ img.style.display = "block";
 } else {
 img.style.display = "none";
 }
+
 const body = String(n?.body || "").trim();
-document.getElementById("homeNewsBody").innerHTML = body ? body.split("\n").slice(0,6).join("<br>") : "Uskoro…";
+document.getElementById("homeNewsBody").innerHTML = body ? body.split("\n").slice(0,6).join("<br>") : "Nema teksta.";
 }
 
 function renderNews(list){
 const host = document.getElementById("newsList");
 if(!list || !list.length){
-host.innerHTML = `<div class="news-item"><h3>Nema vesti</h3><div class="meta"><span>—</span></div><p>Dodaj vest u Adminu.</p></div>`;
+host.innerHTML = `<div class="news-item"><h3>Nema vesti</h3><div class="meta"><span></span></div><p>Dodaj vest u Adminu.</p></div>`;
 return;
 }
 host.innerHTML = list.map(n=>{
@@ -1090,10 +1109,14 @@ return `
 <div class="meta"><span>${date}</span></div>
 ${imgHtml}
 <p>${String(n.body||"").replace(/\n/g,"<br>")}</p>
-</div>`;
+</div>
+`;
 }).join("");
 }
 
+/* ==============================
+TEAM
+================================ */
 function renderTeam(players){
 const host = document.getElementById("teamGroups");
 const order = ["golmani","odbrana","sredina","napad"];
@@ -1147,23 +1170,9 @@ host.appendChild(det);
 });
 }
 
-function renderHistory(rows){
-const box = document.getElementById("historyBox");
-const hint = document.getElementById("historyHint");
-const one = (rows||[])[0];
-
-if(!one){
-box.innerHTML = `<h3>Istorija kluba</h3><p>Nema teksta u bazi. Dodaj 1 red u tabelu <b>history</b>.</p
-
-return;
-}
-
-const title = String(one.title || "Istorija kluba");
-const body = String(one.body || "").trim();
-box.innerHTML = `<h3>${title}</h3><p>${body.replace(/\n/g,"<br>")}</p>`;
-hint.textContent = one.updated_at ? ("Ažurirano: " + new Date(one.updated_at).toLocaleString("sr-RS")) : "";
-}
-
+/* ==============================
+LOAD ALL
+================================ */
 function sortMatches(a,b){
 const da = a.match_date ? new Date(a.match_date).getTime() : 9e15;
 const db = b.match_date ? new Date(b.match_date).getTime() : 9e15;
@@ -1171,12 +1180,14 @@ return da - db;
 }
 
 async function loadAll(){
-const [news, matches, players, tableRows, history] = await Promise.all([
+// istorija statički
+document.getElementById("historyText").innerHTML = HISTORY_TEXT.replace(/\n/g,"<br>");
+
+const [news, matches, players, tableRows] = await Promise.all([
 supaGet("/rest/v1/news?select=*&order=created_at.desc"),
 supaGet("/rest/v1/matches?select=*"),
 supaGet("/rest/v1/players?select=*"),
-supaGet("/rest/v1/table_rows?select=*"),
-supaGetSafe("/rest/v1/history?select=*&order=updated_at.desc&limit=1")
+supaGet("/rest/v1/table_rows?select=*")
 ]);
 
 (matches||[]).sort(sortMatches);
@@ -1205,11 +1216,11 @@ sorted.map((r,i)=>tableRow(i+1, r)).join("") ||
 const note = document.getElementById("tableNote");
 const one = sorted[0];
 note.textContent = one ? `Sezona: ${one.season || "2025/2026"} • Kolo: ${one.round || ""}` : "Uvezi tabelu u Adminu.";
-
-renderHistory(history||[]);
 }
 
-/* --- Admin modal --- */
+/* ==============================
+ADMIN MODAL
+================================ */
 const adminModal = document.getElementById("adminModal");
 const adminMenuBtn = document.getElementById("adminMenuBtn");
 const adminClose = document.getElementById("adminClose");
@@ -1248,6 +1259,7 @@ alert("PIN pogrešan ili admin nije online.");
 setUnlocked(false);
 }
 });
+
 document.getElementById("lockBtn").addEventListener("click", ()=>{
 setUnlocked(false);
 document.getElementById("pinInput").value = "";
