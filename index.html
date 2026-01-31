@@ -839,6 +839,42 @@ Facebook
 const SUPABASE_URL = "https://mjmqqomefxdpqugwvesg.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qbXFxb21lZnhkcHF1Z3d2ZXNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxODAxMjUsImV4cCI6MjA4NDc1NjEyNX0.ZBPrtLp1LV-XiwAb6YdQTcfLlBUTpznK7c5vb0Pd8QQ"; /* ostavi svoj anon key */
 const CLUB_NAME = "Rudar Kostolac";
+function cleanTeamName(name){
+  let s = String(name || "").trim().replace(/\s+/g, " ");
+  if(!s) return "";
+  const kill = ["FK","OFK","GFK","SK","NK","FC","F.C.","ФК","ОФК"];
+  let parts = s.split(" ");
+  while(parts.length && kill.includes(parts[0].toUpperCase())){
+    parts.shift();
+  }
+  return parts.join(" ").trim();
+}
+
+function shortTeamMobile(name){
+  const full = cleanTeamName(name) || String(name || "").trim();
+  if(!full) return "";
+  const tokens = full.split(/\s+/).filter(Boolean);
+  const first = tokens[0] || full;
+  const year = tokens.find(t => /^\d{4}$/.test(t)) || "";
+  return year ? `${first} ${year}` : first;
+}
+function displayTeamName(name){
+  const full = cleanTeamName(name);
+  if(!full) return "";
+
+  const year = (full.match(/\b(18\d{2}|19\d{2}|20\d{2})\b/) || [])[1];
+  const base = full
+    .replace(/\b(18\d{2}|19\d{2}|20\d{2})\b/g, "")
+    .replace(/\s+/g," ")
+    .trim();
+
+  if(window.innerWidth <= 520){
+    return year ? `${base} ${year}` : base;
+  }
+  return full;
+}
+
+}
 
 /* --- Helpers --- */
 function formatDateISO(iso){
@@ -975,9 +1011,9 @@ return `
 </div>
 
 <div class="vs">
-<div class="teamL"><div class="teamName">${shortTeam(m.home_team)}</div></div>
+<div class="teamL"><div class="teamName">${displayTeamName(m.home_team)}</div></div>
 <strong style="color:var(--green2); font-weight:950">vs</strong>
-<div class="teamR"><div class="teamName">${shortTeam(m.away_team)}</div></div>
+<div class="teamR"><div class="teamName">${displayTeamName(m.away_team)}</div></div>
 </div>
 
 <div class="tag ${b.cls}">${tagText}</div>
@@ -1117,8 +1153,8 @@ const hint = document.getElementById("historyHint");
 const one = (rows||[])[0];
 
 if(!one){
-box.innerHTML = `<h3>Istorija kluba</h3><p>Nema teksta u bazi. Dodaj 1 red u tabelu <b>history</b>.</p>`;
-hint.textContent = "Supabase: napravi tabelu history i ubaci 1 red (SQL dole).";
+box.innerHTML = `<h3>Istorija kluba</h3><p>Nema teksta u bazi. Dodaj 1 red u tabelu <b>history</b>.</p
+
 return;
 }
 
