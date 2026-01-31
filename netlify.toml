@@ -1,3 +1,3 @@
 [build]
-  functions = "netlify/functions"
-  publish = "."
+publish = "."
+functions = "netlify/functions"

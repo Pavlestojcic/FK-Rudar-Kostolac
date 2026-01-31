@@ -1,196 +1,245 @@
-export default async (req) => {
-  // CORS
-  if (req.method === "OPTIONS") {
-    return new Response("", {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "POST,OPTIONS",
-      },
-    });
-  }
+// netlify/functions/admin.js
+// ENV:
+// ADMIN_PIN
+// SUPABASE_URL
+// SUPABASE_SERVICE_ROLE_KEY
 
-  try {
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY; // <<< OVO JE BITNO
-    const ADMIN_PIN = process.env.ADMIN_PIN || "482913"; // <<< stavi u Netlify, a ovo je fallback
+const json = (statusCode, obj) => ({
+statusCode,
+headers: {
+"Content-Type": "application/json",
+"Access-Control-Allow-Origin": "*",
+"Access-Control-Allow-Headers": "Content-Type",
+"Access-Control-Allow-Methods": "POST,OPTIONS",
+},
+body: JSON.stringify(obj),
+});
 
-    if (!SUPABASE_URL || !SERVICE_KEY) {
-      return new Response(JSON.stringify({ ok: false, error: "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY" }), {
-        status: 500,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-      });
-    }
+const ok = (data = {}) => json(200, { ok: true, ...data });
+const bad = (status, msg) => json(status, { ok: false, error: msg });
 
-    const body = await req.json().catch(() => ({}));
-    const { pin, action } = body || {};
+const env = (k) => String(process.env[k] || "").trim();
 
-    if (!action) {
-      return new Response(JSON.stringify({ ok: false, error: "Missing action" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-      });
-    }
+function requireEnv() {
+const ADMIN_PIN = env("ADMIN_PIN");
+const SUPABASE_URL = env("SUPABASE_URL");
+const SUPABASE_SERVICE_ROLE_KEY = env("SUPABASE_SERVICE_ROLE_KEY");
 
-    // PIN check za sve admin akcije
-    if (String(pin || "") !== String(ADMIN_PIN)) {
-      return new Response(JSON.stringify({ ok: false, error: "Bad PIN" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-      });
-    }
+if (!ADMIN_PIN) throw new Error("Missing env: ADMIN_PIN");
+if (!SUPABASE_URL) throw new Error("Missing env: SUPABASE_URL");
+if (!SUPABASE_SERVICE_ROLE_KEY) throw new Error("Missing env: SUPABASE_SERVICE_ROLE_KEY");
 
-    const headers = {
-      apikey: SERVICE_KEY,
-      Authorization: `Bearer ${SERVICE_KEY}`,
-      "Content-Type": "application/json",
-    };
+return { ADMIN_PIN, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY };
+}
 
-    // 1) Ping (provera PIN-a)
-    if (action === "ping") {
-      return new Response(JSON.stringify({ ok: true }), {
-        status: 200,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-      });
-    }
+function safeFileName(name) {
+const n = String(name || "file").trim();
+return n.replace(/[^\w.\-]+/g, "_").slice(0, 120) || "file";
+}
 
-    // 2) Upload slike u Supabase Storage (bucket mora biti PUBLIC)
-    // body: { filename, contentType, base64 }
-    if (action === "upload_media") {
-      const bucket = "media";
-      const filename = String(body.filename || "img.jpg");
-      const contentType = String(body.contentType || "image/jpeg");
-      const base64 = String(body.base64 || "");
+async function sbFetch({ url, key, path, method = "GET", body, headers = {} }) {
+const res = await fetch(url + path, {
+method,
+headers: {
+apikey: key,
+Authorization: `Bearer ${key}`,
+"Content-Type": "application/json",
+...headers,
+},
+body: body ? JSON.stringify(body) : undefined,
+});
 
-      if (!base64) {
-        return new Response(JSON.stringify({ ok: false, error: "Missing base64" }), {
-          status: 400,
-          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-        });
-      }
+const text = await res.text();
+let data = null;
+try { data = text ? JSON.parse(text) : null; } catch { data = text; }
 
-      const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-      const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const path = `news/${Date.now()}_${safeName}`;
+if (!res.ok) {
+const msg =
+typeof data === "string"
+? data
+: (data?.message || data?.error || "Supabase error");
+throw new Error(`${res.status} ${msg}`);
+}
+return data;
+}
 
-      const up = await fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${path}`, {
-        method: "POST",
-        headers: {
-          apikey: SERVICE_KEY,
-          Authorization: `Bearer ${SERVICE_KEY}`,
-          "Content-Type": contentType,
-          "x-upsert": "true",
-        },
-        body: bytes,
-      });
+async function sbStorageUpload({ url, key, bucket, objectPath, bytes, contentType }) {
+const up = await fetch(`${url}/storage/v1/object/${encodeURIComponent(bucket)}/${objectPath}`, {
+method: "POST",
+headers: {
+apikey: key,
+Authorization: `Bearer ${key}`,
+"Content-Type": contentType || "application/octet-stream",
+"x-upsert": "true",
+},
+body: bytes,
+});
 
-      const t = await up.text();
-      if (!up.ok) {
-        return new Response(JSON.stringify({ ok: false, error: `Upload failed: ${t}` }), {
-          status: 500,
-          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-        });
-      }
+const txt = await up.text();
+if (!up.ok) throw new Error(`Storage upload failed: ${up.status} ${txt}`);
 
-      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
-      return new Response(JSON.stringify({ ok: true, url: publicUrl }), {
-        status: 200,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-      });
-    }
+return `${url}/storage/v1/object/public/${bucket}/${objectPath}`;
+}
 
-    // 3) Dodaj vest
-    if (action === "add_news") {
-      const payload = {
-        title: String(body.title || "").trim(),
-        body: String(body.body || "").trim(),
-        image_url: String(body.image_url || "").trim(),
-      };
-      if (!payload.title || !payload.body) {
-        return new Response(JSON.stringify({ ok: false, error: "Missing title/body" }), {
-          status: 400,
-          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-        });
-      }
+exports.handler = async (event) => {
+if (event.httpMethod === "OPTIONS") return ok({ preflight: true });
+if (event.httpMethod !== "POST") return bad(405, "Use POST");
 
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/news`, {
-        method: "POST",
-        headers: { ...headers, Prefer: "return=representation" },
-        body: JSON.stringify(payload),
-      });
+let body = {};
+try { body = JSON.parse(event.body || "{}"); } catch { return bad(400, "Bad JSON"); }
 
-      const text = await r.text();
-      if (!r.ok) {
-        return new Response(JSON.stringify({ ok: false, error: text }), {
-          status: 500,
-          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-        });
-      }
+let cfg;
+try { cfg = requireEnv(); } catch (e) { return bad(500, String(e.message || e)); }
 
-      return new Response(JSON.stringify({ ok: true }), {
-        status: 200,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-      });
-    }
+const pin = String(body.pin || "").trim();
+if (!pin) return bad(401, "Missing pin");
+if (pin !== cfg.ADMIN_PIN) return bad(401, "Bad pin");
 
-    // 4) Dodaj utakmicu
-    if (action === "add_match") {
-      const payload = {
-        competition: String(body.competition || "Zona Dunav").trim(),
-        match_date: String(body.match_date || "").trim(),
-        match_time: String(body.match_time || "").trim(),
-        home_team: String(body.home_team || "").trim(),
-        away_team: String(body.away_team || "").trim(),
-        venue: String(body.venue || "").trim(),
-        round: String(body.round || "").trim(),
-        status: String(body.status || "scheduled").trim(),
-      };
-      if (!payload.home_team || !payload.away_team) {
-        return new Response(JSON.stringify({ ok: false, error: "Missing teams" }), {
-          status: 400,
-          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-        });
-      }
+const action = String(body.action || "").trim();
+if (!action) return bad(400, "Missing action");
 
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/matches`, {
-        method: "POST",
-        headers: { ...headers, Prefer: "return=representation" },
-        body: JSON.stringify(payload),
-      });
+try {
+if (action === "ping") return ok({ pong: true });
 
-      const text = await r.text();
-      if (!r.ok) {
-        return new Response(JSON.stringify({ ok: false, error: text }), {
-          status: 500,
-          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-        });
-      }
+if (action === "add_news") {
+const title = String(body.title || "").trim();
+const image_url = String(body.image_url || "").trim();
+const bodyText = String(body.body || "").trim();
+if (!title) return bad(400, "Missing title");
+if (!bodyText) return bad(400, "Missing body");
 
-      return new Response(JSON.stringify({ ok: true }), {
-        status: 200,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-      });
-    }
+const row = await sbFetch({
+url: cfg.SUPABASE_URL,
+key: cfg.SUPABASE_SERVICE_ROLE_KEY,
+path: "/rest/v1/news",
+method: "POST",
+headers: { Prefer: "return=representation" },
+body: [{ title, image_url, body: bodyText }],
+});
 
-    // 5) Dodaj igrača
-    if (action === "add_player") {
-      const payload = {
-        full_name: String(body.full_name || "").trim(),
-        number: Number(body.number || 0),
-        position_group: String(body.position_group || "").trim(),
-      };
-      if (!payload.full_name || !payload.number || !payload.position_group) {
-        return new Response(JSON.stringify({ ok: false, error: "Missing fields" }), {
-          status: 400,
-          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-        });
-      }
+return ok({ inserted: row });
+}
 
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/players`, {
-        method: "POST",
-        headers: { ...headers, Prefer: "return=representation" },
-        body: JSON.stringify(payload),
-      });
+if (action === "add_match") {
+const competition = String(body.competition || "Zona Dunav").trim();
+const match_date = String(body.match_date || "").trim();
+const match_time = String(body.match_time || "").trim();
+const home_team = String(body.home_team || "").trim();
+const away_team = String(body.away_team || "").trim();
+const venue = String(body.venue || "").trim();
+const round = String(body.round || "").trim();
+const status = String(body.status || "scheduled").trim();
 
-      const text =
+if (!home_team || !away_team) return bad(400, "Missing teams");
+
+const row = await sbFetch({
+url: cfg.SUPABASE_URL,
+key: cfg.SUPABASE_SERVICE_ROLE_KEY,
+path: "/rest/v1/matches",
+method: "POST",
+headers: { Prefer: "return=representation" },
+body: [{
+competition,
+match_date: match_date || null,
+match_time: match_time || null,
+home_team,
+away_team,
+venue: venue || null,
+round: round || null,
+status,
+}],
+});
+
+return ok({ inserted: row });
+}
+
+if (action === "add_player") {
+const full_name = String(body.full_name || "").trim();
+const number = Number(body.number || 0);
+const position_group = String(body.position_group || "").trim();
+
+if (!full_name) return bad(400, "Missing full_name");
+if (!Number.isFinite(number) || number <= 0) return bad(400, "Bad number");
+if (!position_group) return bad(400, "Missing position_group");
+
+const row = await sbFetch({
+url: cfg.SUPABASE_URL,
+key: cfg.SUPABASE_SERVICE_ROLE_KEY,
+path: "/rest/v1/players",
+method: "POST",
+headers: { Prefer: "return=representation" },
+body: [{ full_name, number, position_group }],
+});
+
+return ok({ inserted: row });
+}
+
+if (action === "replace_table") {
+const season = String(body.season || "2025/2026").trim();
+const round = String(body.round || "").trim();
+const rows = Array.isArray(body.rows) ? body.rows : [];
+if (!rows.length) return bad(400, "Missing rows");
+
+await sbFetch({
+url: cfg.SUPABASE_URL,
+key: cfg.SUPABASE_SERVICE_ROLE_KEY,
+path: "/rest/v1/table_rows?id=gt.0",
+method: "DELETE",
+});
+
+const stamped = rows.map(r => ({
+team: String(r.team || "").trim(),
+played: Number(r.played || 0),
+wins: Number(r.wins || 0),
+draws: Number(r.draws || 0),
+losses: Number(r.losses || 0),
+goals_for: Number(r.goals_for || 0),
+goals_against: Number(r.goals_against || 0),
+goal_diff: Number(r.goal_diff || 0),
+points: Number(r.points || 0),
+season,
+round,
+})).filter(r => r.team);
+
+if (!stamped.length) return bad(400, "Rows invalid");
+
+const ins = await sbFetch({
+url: cfg.SUPABASE_URL,
+key: cfg.SUPABASE_SERVICE_ROLE_KEY,
+path: "/rest/v1/table_rows",
+method: "POST",
+headers: { Prefer: "return=representation" },
+body: stamped,
+});
+
+return ok({ inserted: ins.length || 0 });
+}
+
+if (action === "upload_media") {
+const filename = safeFileName(body.filename || "news.jpg");
+const contentType = String(body.contentType || "image/jpeg").trim();
+const base64 = String(body.base64 || "").trim();
+if (!base64) return bad(400, "Missing base64");
+
+const bytes = Buffer.from(base64, "base64");
+if (!bytes.length) return bad(400, "Bad base64");
+
+const objectPath = `news/${Date.now()}_${filename}`;
+
+const publicUrl = await sbStorageUpload({
+url: cfg.SUPABASE_URL,
+key: cfg.SUPABASE_SERVICE_ROLE_KEY,
+bucket: "public",
+objectPath,
+bytes,
+contentType,
+});
+
+return ok({ url: publicUrl, path: objectPath });
+}
+
+return bad(400, "Unknown action");
+} catch (e) {
+return bad(500, String(e.message || e));
+}
+};
