@@ -1,83 +1,108 @@
 // netlify/functions/admin.js
-// Node 18+ (Netlify) ima global fetch
+// Radi na Netlify Functions (Node 18+) - koristi global fetch
 
-const json = (status, obj) => ({
-  statusCode: status,
+const json = (statusCode, obj, extraHeaders = {}) => ({
+  statusCode,
   headers: {
     "Content-Type": "application/json; charset=utf-8",
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST,OPTIONS",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    ...extraHeaders,
   },
   body: JSON.stringify(obj),
 });
 
-function mustEnv(name) {
+const mustEnv = (name) => {
   const v = process.env[name];
   if (!v) throw new Error(`Missing env: ${name}`);
   return v;
-}
+};
 
-async function supaRest({ baseUrl, serviceKey, method, path, body, extraHeaders }) {
-  const url = `${baseUrl}${path}`;
-  const res = await fetch(url, {
+const safeName = (s) =>
+  String(s || "")
+    .trim()
+    .replace(/[^\w.\- ]+/g, "")
+    .replace(/\s+/g, "_")
+    .slice(0, 120);
+
+async function supaFetch(path, { method = "GET", body, headers = {} } = {}) {
+  const SUPABASE_URL = mustEnv("SUPABASE_URL");
+  const SERVICE = mustEnv("SUPABASE_SERVICE_ROLE_KEY");
+
+  const res = await fetch(SUPABASE_URL + path, {
     method,
     headers: {
-      "apikey": serviceKey,
-      "Authorization": `Bearer ${serviceKey}`,
-      "Accept": "application/json",
-      ...(body ? { "Content-Type": "application/json" } : {}),
-      ...(extraHeaders || {}),
+      apikey: SERVICE,
+      Authorization: `Bearer ${SERVICE}`,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      ...headers,
     },
     body: body ? JSON.stringify(body) : undefined,
   });
 
   const text = await res.text();
-  let data;
-  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+  let data = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = text;
+  }
 
   if (!res.ok) {
-    const msg = typeof data === "string" ? data : (data?.message || data?.error || "Supabase error");
+    const msg =
+      typeof data === "string"
+        ? data
+        : (data && (data.message || data.error_description || data.error)) || "Supabase error";
     throw new Error(`${res.status} ${msg}`);
   }
+
   return data;
 }
 
-async function supaUpload({ baseUrl, serviceKey, bucket, objectPath, contentType, base64 }) {
-  const bytes = Buffer.from(base64, "base64");
-  const url = `${baseUrl}/storage/v1/object/${bucket}/${objectPath}`;
+async function supaStorageUpload({ filename, contentType, base64 }) {
+  const SUPABASE_URL = mustEnv("SUPABASE_URL");
+  const SERVICE = mustEnv("SUPABASE_SERVICE_ROLE_KEY");
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "apikey": serviceKey,
-      "Authorization": `Bearer ${serviceKey}`,
-      "Content-Type": contentType || "application/octet-stream",
-      "x-upsert": "true",
-    },
-    body: bytes,
-  });
+  // Bucket ime promeni ako ti nije "media"
+  const BUCKET = process.env.SUPABASE_BUCKET || "media";
 
-  const text = await res.text();
-  if (!res.ok) {
-    throw new Error(`${res.status} ${text || "Upload failed"}`);
-  }
+  const clean = safeName(filename || "image.jpg");
+  const key = `${Date.now()}_${clean}`;
 
-  // public URL (ako ti je bucket public)
-  const publicUrl = `${baseUrl}/storage/v1/object/public/${bucket}/${objectPath}`;
-  return { publicUrl };
+  const bin = Buffer.from(String(base64 || ""), "base64");
+
+  const up = await fetch(
+    `${SUPABASE_URL}/storage/v1/object/${encodeURIComponent(BUCKET)}/${encodeURIComponent(key)}`,
+    {
+      method: "POST",
+      headers: {
+        apikey: SERVICE,
+        Authorization: `Bearer ${SERVICE}`,
+        "Content-Type": contentType || "image/jpeg",
+        "x-upsert": "true",
+      },
+      body: bin,
+    }
+  );
+
+  const upText = await up.text();
+  if (!up.ok) throw new Error(`${up.status} Storage upload failed: ${upText}`);
+
+  // public url (ako bucket nije public, ovo neće raditi bez signed url)
+  const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${encodeURIComponent(BUCKET)}/${encodeURIComponent(
+    key
+  )}`;
+
+  return { url: publicUrl, key, bucket: BUCKET };
 }
 
 exports.handler = async (event) => {
   try {
     if (event.httpMethod === "OPTIONS") return json(200, { ok: true });
+    if (event.httpMethod !== "POST") return json(405, { ok: false, error: "Use POST" });
 
-    if (event.httpMethod !== "POST") {
-      return json(405, { ok: false, error: "Use POST" });
-    }
-
-    const SUPABASE_URL = mustEnv("SUPABASE_URL").replace(/\/$/, "");
-    const SUPABASE_SERVICE_ROLE_KEY = mustEnv("SUPABASE_SERVICE_ROLE_KEY");
     const ADMIN_PIN = mustEnv("ADMIN_PIN");
 
     let payload = {};
@@ -87,139 +112,114 @@ exports.handler = async (event) => {
       return json(400, { ok: false, error: "Bad JSON" });
     }
 
-    const { action, pin } = payload;
+    const pin = String(payload.pin || "").trim();
+    const action = String(payload.action || "").trim();
 
-    if (!pin || String(pin).trim() !== String(ADMIN_PIN).trim()) {
-      return json(401, { ok: false, error: "PIN pogrešan" });
-    }
+    if (!action) return json(400, { ok: false, error: "Missing action" });
+    if (pin !== ADMIN_PIN) return json(401, { ok: false, error: "Bad PIN" });
 
-    // ping (provera pina)
-    if (action === "ping") {
-      return json(200, { ok: true });
-    }
+    // 1) ping
+    if (action === "ping") return json(200, { ok: true });
 
-    // upload slike vesti u Storage bucket "media" u folder "news"
-    // OVO TRAZI da ima bucket "media" i da je public
+    // 2) upload_media
     if (action === "upload_media") {
-      const filename = String(payload.filename || "").trim();
-      const contentType = String(payload.contentType || "image/jpeg").trim();
-      const base64 = String(payload.base64 || "").trim();
-
-      if (!filename || !base64) {
-        return json(400, { ok: false, error: "Missing filename/base64" });
-      }
-
-      const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const objectPath = `news/${Date.now()}_${safeName}`;
-
-      const up = await supaUpload({
-        baseUrl: SUPABASE_URL,
-        serviceKey: SUPABASE_SERVICE_ROLE_KEY,
-        bucket: "media",
-        objectPath,
-        contentType,
-        base64,
+      const out = await supaStorageUpload({
+        filename: payload.filename,
+        contentType: payload.contentType,
+        base64: payload.base64,
       });
-
-      return json(200, { ok: true, url: up.publicUrl });
+      return json(200, { ok: true, url: out.url });
     }
 
-    // add news
+    // 3) add_news
     if (action === "add_news") {
       const title = String(payload.title || "").trim();
-      const image_url = String(payload.image_url || "").trim();
       const body = String(payload.body || "").trim();
+      const image_url = String(payload.image_url || "").trim();
 
-      if (!title || !body) return json(400, { ok: false, error: "Popuni naslov i tekst" });
+      if (!title || !body) return json(400, { ok: false, error: "Missing title/body" });
 
-      await supaRest({
-        baseUrl: SUPABASE_URL,
-        serviceKey: SUPABASE_SERVICE_ROLE_KEY,
+      const data = await supaFetch("/rest/v1/news", {
         method: "POST",
-        path: "/rest/v1/news",
-        body: [{ title, image_url, body }],
-        extraHeaders: { "Prefer": "return=minimal" },
+        headers: { Prefer: "return=representation" },
+        body: [{ title, body, image_url }],
       });
 
-      return json(200, { ok: true });
+      return json(200, { ok: true, data });
     }
 
-    // add match
+    // 4) add_match
     if (action === "add_match") {
+      const match_date = String(payload.match_date || "").trim(); // YYYY-MM-DD
+      const match_time = String(payload.match_time || "").trim();
+      const home_team = String(payload.home_team || "").trim();
+      const away_team = String(payload.away_team || "").trim();
+
+      if (!home_team || !away_team) return json(400, { ok: false, error: "Missing teams" });
+
       const row = {
         competition: String(payload.competition || "Zona Dunav").trim(),
-        match_date: String(payload.match_date || "").trim(),
-        match_time: String(payload.match_time || "").trim(),
-        home_team: String(payload.home_team || "").trim(),
-        away_team: String(payload.away_team || "").trim(),
+        match_date,
+        match_time,
+        home_team,
+        away_team,
         venue: String(payload.venue || "").trim(),
         round: String(payload.round || "").trim(),
         status: String(payload.status || "scheduled").trim(),
       };
 
-      if (!row.home_team || !row.away_team) return json(400, { ok: false, error: "Popuni timove" });
-
-      await supaRest({
-        baseUrl: SUPABASE_URL,
-        serviceKey: SUPABASE_SERVICE_ROLE_KEY,
+      const data = await supaFetch("/rest/v1/matches", {
         method: "POST",
-        path: "/rest/v1/matches",
+        headers: { Prefer: "return=representation" },
         body: [row],
-        extraHeaders: { "Prefer": "return=minimal" },
       });
 
-      return json(200, { ok: true });
+      return json(200, { ok: true, data });
     }
 
-    // add player
+    // 5) add_player
     if (action === "add_player") {
       const full_name = String(payload.full_name || "").trim();
-      const number = Number(payload.number || 0);
       const position_group = String(payload.position_group || "").trim();
+      const number = Number(payload.number);
 
-      if (!full_name || !number || !position_group) {
-        return json(400, { ok: false, error: "Popuni polja" });
+      if (!full_name || !position_group || !Number.isFinite(number) || number <= 0) {
+        return json(400, { ok: false, error: "Missing full_name/number/position_group" });
       }
 
-      await supaRest({
-        baseUrl: SUPABASE_URL,
-        serviceKey: SUPABASE_SERVICE_ROLE_KEY,
+      const data = await supaFetch("/rest/v1/players", {
         method: "POST",
-        path: "/rest/v1/players",
+        headers: { Prefer: "return=representation" },
         body: [{ full_name, number, position_group }],
-        extraHeaders: { "Prefer": "return=minimal" },
       });
 
-      return json(200, { ok: true });
+      return json(200, { ok: true, data });
     }
 
-    // replace table
+    // 6) replace_table
     if (action === "replace_table") {
-      const season = String(payload.season || "2025/2026").trim();
+      const season = String(payload.season || "").trim();
       const round = String(payload.round || "").trim();
       const rows = Array.isArray(payload.rows) ? payload.rows : [];
 
-      if (!rows.length) return json(400, { ok: false, error: "Nema redova" });
+      if (!rows.length) return json(400, { ok: false, error: "No rows" });
 
-      // obriši sve
-      await supaRest({
-        baseUrl: SUPABASE_URL,
-        serviceKey: SUPABASE_SERVICE_ROLE_KEY,
-        method: "DELETE",
-        path: "/rest/v1/table_rows?id=gt.0",
-      });
+      // Obriši sve (radi ako tabela ima kolonu id)
+      // Ako ti ne radi, javi i prilagodiću filter za tvoju šemu.
+      await supaFetch("/rest/v1/table_rows?id=gt.0", { method: "DELETE" });
 
-      // upiši nove
-      const toInsert = rows.map(r => ({
+      const toInsert = rows.map((r) => ({
+        team: String(r.team || "").trim(),
+        played: Number(r.played) || 0,
+        wins: Number(r.wins) || 0,
+        draws: Number(r.draws) || 0,
+        losses: Number(r.losses) || 0,
+        goals_for: Number(r.goals_for) || 0,
+        goals_against: Number(r.goals_against) || 0,
+        goal_diff: Number(r.goal_diff) || 0,
+        points: Number(r.points) || 0,
         season,
         round,
-        team: String(r.team || "").trim(),
-        played: Number(r.played || 0),
-        wins: Number(r.wins || 0),
-        draws: Number(r.draws || 0),
-        losses: Number(r.losses || 0),
-        goals_for: Number(r.goals_for || 0),
-        goals_against: Number(r.goals_against || 0),
-        goal_diff: Number(r.goal_diff || 0),
-        points: Number(r.points || 0),
       }));
+
+      const data = await supaFetch("/rest/v1/table_rows", {
