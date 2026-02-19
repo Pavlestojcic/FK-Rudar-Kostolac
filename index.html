@@ -470,6 +470,16 @@ line-height:1.15;
 .tick{padding: 8px 10px; font-size: 11px; gap: 8px;}
 .tick small{ font-size: 10px; }
 }
+.newsTitle{
+  font-weight: 900;
+  font-size: 18px;
+  padding: 14px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.newsTitle:hover{ opacity: 0.9; }
 </style>
 </head>
 
@@ -618,13 +628,12 @@ line-height:1.15;
 <p>Objave</p>
 </div>
 <div id="newsList"></div>
-<div id="newsDetail" style="display:none">
-  <button id="backToNews" type="button">← Nazad</button>
-  <h2 id="newsTitle"></h2>
-  <div id="newsMeta" style="opacity:.8; margin:6px 0 12px"></div>
-  <img id="newsImage" style="display:none; width:100%; border-radius:12px; margin:10px 0">
-  <div id="newsContent"></div>
-</div>
+<div id="newsDetail" style="display:none;">
+  <button class="btn" type="button" onclick="backToNews()">← Nazad na vesti</button>
+  <h2 id="newsDetailTitle"></h2>
+  <div class="meta"><span id="newsDetailDate"></span></div>
+  <img id="newsDetailImg" class="news-img" style="display:none;" alt="">
+  <div id="newsDetailBody"></div>
 </div>
 </section>
 
@@ -1100,74 +1109,88 @@ const body = String(n?.body || "").trim();
 document.getElementById("homeNewsBody").innerHTML = body ? body.split("\n").slice(0,6).join("<br>") : "Nema teksta.";
 }
 let __NEWS_CACHE__ = [];
+
 function escapeHtml(s){
-  return String(s || "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#39;");
+return String(s || "")
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#39;");
 }
+
 function renderNews(list){
-  __NEWS_CACHE__ = list || [];
+const host = document.getElementById("newsList");
+if(!host) return;
 
-  const el = document.getElementById("newsList");
-  if(!el) return;
+__NEWS_CACHE__ = list || [];
 
-  if(!__NEWS_CACHE__.length){
-    el.innerHTML = `<div class="hint">Nema vesti.</div>`;
-    return;
-  }
+// prikaz liste, sakrij detalj
+const detail = document.getElementById("newsDetail");
+if(detail) detail.style.display = "none";
+host.style.display = "block";
 
-  el.innerHTML = __NEWS_CACHE__.map(n => `
-    <div class="newsTitle" onclick="openNews('${String(n.id)}')">
-      ${escapeHtml(n.title || "Bez naslova")}
-    </div>
-  `).join("");
+if(!__NEWS_CACHE__.length){
+host.innerHTML = `<div class="hint">Nema vesti.</div>`;
+return;
+}
+
+host.innerHTML = __NEWS_CACHE__.map(n => `
+<div class="newsTitle" onclick="openNews('${String(n.id)}')">
+${escapeHtml(n.title || "Bez naslova")}
+</div>
+`).join("");
 }
 
 function openNews(id){
-  const one = (__NEWS_CACHE__ || []).find(x => String(x.id) === String(id));
-  if(!one) return;
+const one = (__NEWS_CACHE__ || []).find(x => String(x.id) === String(id));
+if(!one) return;
 
-  document.getElementById("newsList").style.display = "none";
-  document.getElementById("newsDetail").style.display = "";
+const listEl = document.getElementById("newsList");
+const detailEl = document.getElementById("newsDetail");
+if(!listEl || !detailEl) return;
 
-  document.getElementById("newsTitle").textContent = one.title || "Bez naslova";
-  document.getElementById("newsMeta").textContent = one.created_at ? formatDateISO(one.created_at) : "";
+listEl.style.display = "none";
+detailEl.style.display = "block";
 
-  const img = document.getElementById("newsImage");
-  if(one.image_url){
-    img.src = one.image_url;
-    img.style.display = "";
-  }else{
-    img.style.display = "none";
-  }
+const titleEl = document.getElementById("newsDetailTitle");
+const dateEl = document.getElementById("newsDetailDate");
+const imgEl = document.getElementById("newsDetailImg");
+const bodyEl = document.getElementById("newsDetailBody");
 
-  document.getElementById("newsContent").innerHTML = (one.body || one.content || "").replace(/\n/g,"<br>");
+if(titleEl) titleEl.textContent = one.title || "Bez naslova";
+
+const date = one.created_at ? new Date(one.created_at).toLocaleString("sr-RS") : "";
+if(dateEl) dateEl.textContent = date;
+
+const img = String(one.image_url || "").trim();
+if(imgEl){
+if(img){
+imgEl.src = img;
+imgEl.style.display = "block";
+imgEl.onerror = () => { imgEl.style.display = "none"; imgEl.removeAttribute("src"); };
+} else {
+imgEl.style.display = "none";
+imgEl.removeAttribute("src");
+}
 }
 
-document.addEventListener("click", (e) => {
-  if(e.target && e.target.id === "backToNews"){
-    document.getElementById("newsDetail").style.display = "none";
-    document.getElementById("newsList").style.display = "";
-  }
-});
-
-host.innerHTML = list.map(n=>{
-const img = String(n.image_url||"").trim();
-const imgHtml = img ? `<img class="news-img" src="${img}" alt="" onerror="this.style.display='none'">` : "";
-const date = n.created_at ? new Date(n.created_at).toLocaleString("sr-RS") : "";
-return `
-<div class="news-item">
-<h3>${n.title}</h3>
-<div class="meta"><span>${date}</span></div>
-${imgHtml}
-<p>${String(n.body||"").replace(/\n/g,"<br>")}</p>
-</div>
-`;
-}).join("");
+const body = String(one.body || "").trim();
+if(bodyEl){
+bodyEl.innerHTML = body ? escapeHtml(body).replace(/\n/g, "<br>") : "";
 }
+}
+
+function backToNews(){
+const detailEl = document.getElementById("newsDetail");
+const listEl = document.getElementById("newsList");
+if(detailEl) detailEl.style.display = "none";
+if(listEl) listEl.style.display = "block";
+}
+
+
+
+
 
 /* ==============================
 TEAM
