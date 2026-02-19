@@ -1154,7 +1154,6 @@ document.addEventListener("click", (e) => {
   }
 });
 
-}
 host.innerHTML = list.map(n=>{
 const img = String(n.image_url||"").trim();
 const imgHtml = img ? `<img class="news-img" src="${img}" alt="" onerror="this.style.display='none'">` : "";
