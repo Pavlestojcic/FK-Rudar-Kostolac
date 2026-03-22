@@ -1477,46 +1477,19 @@ await loadAll();
 alert("Tabela uvezena.");
 });
 
-window.addEventListener("load", async ()=>{
-try{
-await loadAll();
-}catch(e){
-alert(String(e.message || e));
-}
-});
-const params = new URLSearchParams(window.location.search);
-const id = params.get("news");
+window.addEventListener("load", async () => {
+    try {
+        await loadALL();
+    } catch (e) {
+        alert(String(e.message || e));
+    }
 
-if (id) {
-  openNews(id);
-}
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("news");
 
-function openNews(id) {
-  const one = __NEWS_CACHE__.find(n => String(n.id) === String(id));
-  if (!one) return;
+    if (id) {
 
-  document.getElementById("newsList").style.display = "none";
-  document.getElementById("newsDetail").style.display = "block";
 
-  document.getElementById("newsDetailTitle").innerText = one.title || "";
-
-  const img = document.getElementById("newsDetailImage");
-  if (one.image_url) {
-    img.src = one.image_url;
-    img.style.display = "block";
-  } else {
-    img.style.display = "none";
-  }
-
-  document.getElementById("newsDetailBody").innerHTML =
-    (one.body || "").replace(/\n/g, "<br>");
-}
-const params = new URLSearchParams(window.location.search);
-const id = params.get("news");
-
-if (id) {
-  openNews(id);
-}
 
 </script>
 </body>
