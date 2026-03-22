@@ -1136,15 +1136,14 @@ if(!__NEWS_CACHE__.length){
 host.innerHTML = `<div class="hint">Nema vesti.</div>`;
 return;
 }
-
 host.innerHTML = __NEWS_CACHE__.map(n => `
-<a class="newsTitle" href="?news=${String(n.id)}">
-  ${escapeHtml(n.title || "Bez naslova")}
-</a>
-${escapeHtml(n.title || "Bez naslova")}
-</div>
+  <div class="news-item">
+    <a class="newsTitle" href="?news=${String(n.id)}">
+      ${escapeHtml(n.title || "Bez naslova")}
+    </a>
+  </div>
 `).join("");
-}
+
 
 function openNews(id){
 const one = (__NEWS_CACHE__ || []).find(x => String(x.id) === String(id));
@@ -1485,6 +1484,40 @@ await loadAll();
 alert(String(e.message || e));
 }
 });
+const params = new URLSearchParams(window.location.search);
+const id = params.get("news");
+
+if (id) {
+  openNews(id);
+}
+
+function openNews(id) {
+  const one = __NEWS_CACHE__.find(n => String(n.id) === String(id));
+  if (!one) return;
+
+  document.getElementById("newsList").style.display = "none";
+  document.getElementById("newsDetail").style.display = "block";
+
+  document.getElementById("newsDetailTitle").innerText = one.title || "";
+
+  const img = document.getElementById("newsDetailImage");
+  if (one.image_url) {
+    img.src = one.image_url;
+    img.style.display = "block";
+  } else {
+    img.style.display = "none";
+  }
+
+  document.getElementById("newsDetailBody").innerHTML =
+    (one.body || "").replace(/\n/g, "<br>");
+}
+const params = new URLSearchParams(window.location.search);
+const id = params.get("news");
+
+if (id) {
+  openNews(id);
+}
+
 </script>
 </body>
 </html>
