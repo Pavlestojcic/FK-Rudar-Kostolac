@@ -475,6 +475,7 @@ transition: all 0.2s;
 display: block;
 width: 100%;
 text-align: center;
+cursor: pointer;
 }
 .news-read-btn:hover{
 background: rgba(25,197,107,.35);
@@ -567,6 +568,7 @@ box-shadow: 0 4px 12px rgba(25,197,107,.3);
 <div class="meta"><span id="homeNewsDate"></span></div>
 <img id="homeNewsImg" class="news-img" style="display:none" alt="" />
 <p id="homeNewsBody"></p>
+<button id="homeNewsReadBtn" class="news-read-btn" style="display:none;">Pročitaj više →</button>
 </div>
 </div>
 </div>
@@ -1013,18 +1015,27 @@ return `
 NEWS
 ================================ */
 function renderHomeNews(n){
-document.getElementById("homeNewsTitle").textContent = n?.title || "Nema vesti";
-document.getElementById("homeNewsDate").textContent = n?.created_at ? new Date(n.created_at).toLocaleString("sr-RS") : "";
-const img = document.getElementById("homeNewsImg");
-const src = String(n?.image_url || "").trim();
-if(src){
-img.src = src;
-img.style.display = "block";
-} else {
-img.style.display = "none";
-}
-const body = String(n?.body || "").trim();
-document.getElementById("homeNewsBody").innerHTML = body ? body.split("\n").slice(0,6).join("<br>") : "Nema teksta.";
+  document.getElementById("homeNewsTitle").textContent = n?.title || "Nema vesti";
+  document.getElementById("homeNewsDate").textContent = n?.created_at ? new Date(n.created_at).toLocaleString("sr-RS") : "";
+  const img = document.getElementById("homeNewsImg");
+  const src = String(n?.image_url || "").trim();
+  if(src){
+    img.src = src;
+    img.style.display = "block";
+  } else {
+    img.style.display = "none";
+  }
+  const body = String(n?.body || "").trim();
+  document.getElementById("homeNewsBody").innerHTML = body ? body.split("\n").slice(0,6).join("<br>") : "Nema teksta.";
+
+  // LOGIKA ZA DUGME PROČITAJ VIŠE
+  const readBtn = document.getElementById("homeNewsReadBtn");
+  if(n && n.id) {
+    readBtn.style.display = "block";
+    readBtn.onclick = () => openNews(n.id);
+  } else {
+    readBtn.style.display = "none";
+  }
 }
 let __NEWS_CACHE__ = [];
 function escapeHtml(s){
