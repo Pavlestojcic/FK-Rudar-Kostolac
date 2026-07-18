@@ -3,9 +3,19 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>FK Rudar Kostolac</title>
-<meta name="description" content="FK Rudar Kostolac | Zvanična klupska stranica" />
+<title id="metaTitleTag">FK Rudar Kostolac</title>
+<meta id="metaDescTag" name="description" content="FK Rudar Kostolac | Zvanična klupska stranica" />
 <link rel="icon" type="image/png" href="assets/img/rudar_logo_transparent.png">
+<meta property="og:type" content="website" id="ogTypeTag" />
+<meta property="og:site_name" content="FK Rudar Kostolac" />
+<meta property="og:title" content="FK Rudar Kostolac" id="ogTitleTag" />
+<meta property="og:description" content="FK Rudar Kostolac | Zvanična klupska stranica" id="ogDescTag" />
+<meta property="og:image" content="assets/img/rudar_logo_transparent.png" id="ogImageTag" />
+<meta property="og:url" content="/" id="ogUrlTag" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="FK Rudar Kostolac" id="twTitleTag" />
+<meta name="twitter:description" content="FK Rudar Kostolac | Zvanična klupska stranica" id="twDescTag" />
+<meta name="twitter:image" content="assets/img/rudar_logo_transparent.png" id="twImageTag" />
 
 <style>
 :root{
@@ -482,9 +492,169 @@ background: rgba(25,197,107,.35);
 transform: translateY(-2px);
 box-shadow: 0 4px 12px rgba(25,197,107,.3);
 }
+.news-read-btn .arrow{display:inline-block; transition:transform .2s ease; margin-left:2px}
+.news-read-btn:hover .arrow{transform:translateX(4px)}
+
+/* ===== TOP LOADER ===== */
+.top-loader{
+position:fixed; top:0; left:0; height:3px; width:0%;
+background: linear-gradient(90deg, var(--green), var(--green2));
+z-index:300; box-shadow: 0 0 12px rgba(14,224,138,.6);
+transition: width .35s ease, opacity .4s ease;
+}
+.top-loader.done{opacity:0}
+
+/* ===== SKELETONS ===== */
+.skeleton{
+position:relative; overflow:hidden;
+background: rgba(233,243,236,.06);
+border-radius:14px;
+}
+.skeleton::after{
+content:""; position:absolute; inset:0;
+background: linear-gradient(90deg, transparent, rgba(233,243,236,.09), transparent);
+transform:translateX(-100%);
+animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer{100%{transform:translateX(100%)}}
+.sk-match{height:64px; margin-bottom:10px; border:1px solid rgba(233,243,236,.08)}
+.sk-news{height:150px; margin-bottom:10px; border:1px solid rgba(233,243,236,.08)}
+.sk-line{height:13px; border-radius:8px; margin:8px 0}
+.sk-line.w60{width:60%}
+.sk-line.w40{width:40%}
+.sk-row{height:16px; border-radius:6px; display:block; margin:14px 10px}
+
+/* ===== VIEW / ITEM ANIMATIONS ===== */
+.view.active{animation: viewIn .35s ease}
+@keyframes viewIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
+.fade-item{animation: itemIn .4s cubic-bezier(.2,.8,.2,1) both}
+@keyframes itemIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
+
+/* ===== DRAWER / MODAL open transitions ===== */
+.drawer{opacity:0; visibility:hidden; pointer-events:none; transition:opacity .25s ease, visibility .25s ease}
+.drawer.open{opacity:1; visibility:visible; pointer-events:auto; display:block}
+.drawer-panel{transform:translateX(24px); transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.drawer.open .drawer-panel{transform:translateX(0)}
+.modal{display:flex; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .22s ease, visibility .22s ease}
+.modal.open{opacity:1; visibility:visible; pointer-events:auto}
+.modal-card{transform:translateY(10px) scale(.98); transition:transform .28s cubic-bezier(.2,.8,.2,1)}
+.modal.open .modal-card{transform:translateY(0) scale(1)}
+
+/* ===== TOAST ===== */
+.toast{
+position:fixed; left:50%; bottom:22px; transform:translate(-50%, 16px);
+max-width:min(420px, 92vw);
+background: rgba(11,18,14,.96); border:1px solid rgba(25,197,107,.4);
+color:var(--text); padding:12px 16px; border-radius:14px;
+box-shadow: var(--shadow); font-weight:900; font-size:13px;
+display:flex; align-items:center; gap:10px;
+z-index:220; opacity:0; pointer-events:none;
+transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .3s ease;
+cursor:pointer;
+}
+.toast.show{opacity:1; transform:translate(-50%, 0); pointer-events:auto}
+.toast .dot{flex:0 0 auto}
+
+/* ===== SEARCH ===== */
+.search-wrap{position:relative; margin-bottom:14px}
+.search-wrap input{padding-left:42px}
+.search-wrap svg{position:absolute; left:14px; top:50%; transform:translateY(-50%); width:16px; height:16px; opacity:.55; pointer-events:none}
+
+/* ===== NEWS DETAIL ===== */
+.news-back-btn{
+display:inline-flex; align-items:center; gap:8px;
+background: rgba(15,26,20,.55); border:1px solid rgba(233,243,236,.14);
+color: var(--text); font-weight:950; letter-spacing:.2px; font-size:13px;
+padding:10px 14px; border-radius:14px; cursor:pointer; margin-bottom:16px;
+transition:.15s ease; font-family:inherit;
+}
+.news-back-btn:hover{border-color: rgba(25,197,107,.40); background: rgba(25,197,107,.08); transform:translateX(-2px)}
+.news-detail-top{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:2px}
+.share-btn{
+display:inline-flex; align-items:center; gap:8px;
+background: rgba(15,26,20,.55); border:1px solid rgba(233,243,236,.14);
+color:var(--text); font-weight:950; font-size:12px;
+padding:9px 12px; border-radius:12px; cursor:pointer; transition:.15s ease; font-family:inherit;
+}
+.share-btn:hover{border-color: rgba(25,197,107,.4); background: rgba(25,197,107,.08)}
+#newsDetailTitle{font-size:clamp(21px,3.2vw,30px); line-height:1.18; margin:12px 0 8px; letter-spacing:.3px}
+#newsDetailBody{line-height:1.75; font-weight:750; opacity:.95; font-size:15px}
+
+/* ===== RESULTS / SCORE ===== */
+.match.result{cursor:pointer}
+.match.result:hover{border-color: rgba(25,197,107,.35); background: rgba(25,197,107,.07); transform:translateY(-1px)}
+.match{transition:.15s ease}
+.score{
+display:flex; align-items:center; justify-content:center; gap:6px;
+font-weight:950; font-size:15px; letter-spacing:.3px;
+background: rgba(11,18,14,.6); border:1px solid rgba(233,243,236,.12);
+border-radius:12px; padding:8px 10px; min-width:58px; white-space:nowrap;
+}
+.score .sep{color:var(--muted); font-weight:900; font-size:12px}
+.report-hint{color:var(--muted); font-weight:900; font-size:10px; letter-spacing:.2px; text-align:center; margin-top:4px}
+
+/* ===== MATCH REPORT MODAL ===== */
+.report-score{display:flex; align-items:center; justify-content:center; gap:18px; margin:6px 0 16px; text-align:center}
+.report-score .team{font-size:13px; color:var(--muted); font-weight:900; max-width:130px}
+.report-score .big{font-size:30px; font-weight:950; letter-spacing:.5px}
+.scorers-list{display:flex; flex-direction:column; gap:6px; margin:6px 0 4px}
+.scorer-row{
+display:flex; align-items:center; gap:8px; font-weight:850; font-size:13px;
+padding:9px 12px; border-radius:12px;
+background: rgba(15,26,20,.42); border:1px solid rgba(233,243,236,.08);
+}
+.report-gallery{display:grid; grid-template-columns:repeat(auto-fill, minmax(100px,1fr)); gap:8px; margin-top:12px}
+.report-gallery img{width:100%; height:88px; object-fit:cover; border-radius:12px; border:1px solid rgba(233,243,236,.1)}
+
+/* ===== ADMIN: existing item lists (edit / delete) ===== */
+.admin-list{display:flex; flex-direction:column; gap:8px; max-height:280px; overflow:auto; margin:10px 0}
+.admin-list-item{
+display:flex; align-items:center; justify-content:space-between; gap:10px;
+padding:10px 12px; border-radius:12px;
+border:1px solid rgba(233,243,236,.10); background: rgba(15,26,20,.4);
+font-size:12.5px; font-weight:800;
+}
+.admin-list-item .ai-title{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0}
+.admin-list-actions{display:flex; gap:6px; flex-shrink:0}
+.admin-mini-btn{
+padding:7px 10px; border-radius:10px; border:1px solid rgba(233,243,236,.14);
+background: rgba(11,18,14,.6); color:var(--text); font-weight:900; font-size:11px;
+cursor:pointer; transition:.15s ease; font-family:inherit;
+}
+.admin-mini-btn:hover{border-color: rgba(25,197,107,.4)}
+.admin-mini-btn.danger:hover{border-color: rgba(230,90,90,.6); color:#ff9a9a}
+.editing-banner{
+display:flex; align-items:center; justify-content:space-between; gap:10px;
+padding:10px 12px; border-radius:12px; margin:10px 0;
+background: rgba(25,197,107,.12); border:1px solid rgba(25,197,107,.4);
+font-weight:900; font-size:12px;
+}
+.editing-banner button{
+background:transparent; border:1px solid rgba(233,243,236,.2); color:var(--text);
+border-radius:8px; padding:5px 9px; font-weight:900; font-size:11px; cursor:pointer; font-family:inherit;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state{
+padding:18px 14px; text-align:center; color:var(--muted); font-weight:850; font-size:13px;
+border:1px dashed rgba(233,243,236,.14); border-radius:16px; background: rgba(15,26,20,.25);
+}
+.badge-new{
+display:inline-block; background: rgba(25,197,107,.18); color:var(--green2);
+border:1px solid rgba(25,197,107,.4); font-size:10px; font-weight:950;
+padding:3px 8px; border-radius:999px; letter-spacing:.3px; margin-left:8px;
+animation: pulseNew 1.6s ease infinite;
+}
+@keyframes pulseNew{0%,100%{opacity:1} 50%{opacity:.5}}
+@media (max-width:520px){
+.report-score .big{font-size:24px}
+.report-score{gap:12px}
+}
 </style>
 </head>
 <body>
+<div class="top-loader" id="topLoader"></div>
+<div class="toast" id="toast"></div>
 <header class="topbar">
 <div class="wrap">
 <div class="topbar-inner">
@@ -568,7 +738,7 @@ box-shadow: 0 4px 12px rgba(25,197,107,.3);
 <div class="meta"><span id="homeNewsDate"></span></div>
 <img id="homeNewsImg" class="news-img" style="display:none" alt="" />
 <p id="homeNewsBody"></p>
-<button id="homeNewsReadBtn" class="news-read-btn" style="display:none;">Pročitaj više →</button>
+<button id="homeNewsReadBtn" class="news-read-btn" style="display:none;">Pročitaj više <span class="arrow">→</span></button>
 </div>
 </div>
 </div>
@@ -604,10 +774,17 @@ box-shadow: 0 4px 12px rgba(25,197,107,.3);
 <section class="view" id="viewSchedule">
 <div class="card view-pad">
 <div class="section-head" style="margin:0 0 10px">
-<h2>Raspored</h2>
+<h2>Naredne utakmice</h2>
 <p>Liga, kup, pripremne</p>
 </div>
-<div class="match-list" id="allMatches"></div>
+<div class="match-list" id="upcomingMatches"></div>
+</div>
+<div class="card view-pad" style="margin-top:16px">
+<div class="section-head" style="margin:0 0 10px">
+<h2>Rezultati</h2>
+<p>Klikni na utakmicu za izveštaj</p>
+</div>
+<div class="match-list" id="resultMatches"></div>
 </div>
 </section>
 <section class="view" id="viewNews">
@@ -616,9 +793,16 @@ box-shadow: 0 4px 12px rgba(25,197,107,.3);
 <h2>Vesti</h2>
 <p>Objave</p>
 </div>
+<div class="search-wrap" id="newsSearchWrap">
+<svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+<input id="newsSearchInput" type="text" placeholder="Pretraži vesti…" autocomplete="off" />
+</div>
 <div id="newsList"></div>
 <div id="newsDetail" style="display:none;">
-  <button class="news-back-btn" onclick="backToNews()">← Nazad na sve vesti</button>
+  <div class="news-detail-top">
+    <button class="news-back-btn" onclick="backToNews()">← Nazad na sve vesti</button>
+    <button class="share-btn" id="newsShareBtn" type="button">🔗 Podeli</button>
+  </div>
   <h2 id="newsDetailTitle"></h2>
   <div class="meta"><span id="newsDetailDate"></span></div>
   <img id="newsDetailImg" class="news-img" style="display:none;" alt="">
@@ -732,13 +916,23 @@ Facebook
 <div class="actions"><button class="btn primary" id="uploadNewsImgBtn">Upload</button></div>
 <div class="hint" id="uploadHint"></div>
 <hr class="sep">
-<b>Dodaj vest</b>
+<b>Vesti</b>
+<div class="admin-list" id="adminNewsList"></div>
+<div class="editing-banner" id="newsEditingBanner" style="display:none">
+<span>Izmena vesti: <span id="newsEditingLabel"></span></span>
+<button type="button" id="newsEditingCancel">Otkaži</button>
+</div>
 <div class="field"><label>Naslov</label><input id="nTitle" placeholder="Naslov" /></div>
 <div class="field"><label>Slika (URL)</label><input id="nImage" placeholder="Nakon upload-a auto popuni" /></div>
 <div class="field"><label>Tekst</label><textarea id="nBody" placeholder="Tekst vesti"></textarea></div>
 <div class="actions"><button class="btn primary" id="addNewsBtn">Dodaj vest</button></div>
 <hr class="sep">
-<b>Dodaj utakmicu</b>
+<b>Utakmice</b>
+<div class="admin-list" id="adminMatchesList"></div>
+<div class="editing-banner" id="matchEditingBanner" style="display:none">
+<span>Izmena utakmice: <span id="matchEditingLabel"></span></span>
+<button type="button" id="matchEditingCancel">Otkaži</button>
+</div>
 <div class="row2">
 <div class="field"><label>Datum (YYYY-MM-DD)</label><input id="mDate" placeholder="2026-03-15" /></div>
 <div class="field"><label>Vreme</label><input id="mTime" placeholder="14:30" /></div>
@@ -752,6 +946,17 @@ Facebook
 <div class="field"><label>Kolo</label><input id="mRound" placeholder="15. kolo" /></div>
 </div>
 <div class="field"><label>Lokacija</label><input id="mVenue" placeholder="Kostolac / Gostovanje" /></div>
+<div class="hint">Rezultat i izveštaj popuni posle odigrane utakmice — automatski se prebacuje u „Rezultati“.</div>
+<div class="row2">
+<div class="field"><label>Golovi domaćin</label><input id="mHomeScore" placeholder="npr. 2" inputmode="numeric" /></div>
+<div class="field"><label>Golovi gost</label><input id="mAwayScore" placeholder="npr. 1" inputmode="numeric" /></div>
+</div>
+<div class="field"><label>Strelci</label><textarea id="mScorers" placeholder="Marković 23', Petrović 67'"></textarea></div>
+<div class="field"><label>Tekst izveštaja</label><textarea id="mReport" placeholder="Tekst izveštaja sa utakmice"></textarea></div>
+<div class="field"><label>Slika izveštaja</label><input id="matchFile" type="file" accept="image/*" /></div>
+<div class="actions"><button class="btn" id="uploadMatchImgBtn" type="button">Upload sliku</button></div>
+<div class="hint" id="uploadMatchHint"></div>
+<div class="field"><label>Slike izveštaja (URL, jedna po liniji)</label><textarea id="mReportImages" placeholder="https://..."></textarea></div>
 <div class="actions"><button class="btn primary" id="addMatchBtn">Dodaj utakmicu</button></div>
 <hr class="sep">
 <b>Dodaj igrača</b>
@@ -782,6 +987,27 @@ Facebook
 </div>
 <div class="actions"><button class="btn primary" id="importTableBtn">Uvezi tabelu</button></div>
 </div>
+</div>
+</div>
+</div>
+<div class="modal" id="reportModal" aria-hidden="true">
+<div class="modal-card" role="dialog" aria-modal="true">
+<div class="modal-head">
+<b>Izveštaj sa utakmice</b>
+<button class="modal-close" id="reportClose" aria-label="Zatvori">✕</button>
+</div>
+<div class="modal-body">
+<div class="meta" id="reportMeta"></div>
+<div class="report-score" id="reportScoreBox"></div>
+<div id="reportScorersWrap">
+<p class="mini-title">Strelci</p>
+<div class="scorers-list" id="reportScorers"></div>
+</div>
+<div id="reportTextWrap">
+<hr class="sep">
+<div id="reportText"></div>
+</div>
+<div class="report-gallery" id="reportGallery"></div>
 </div>
 </div>
 </div>
@@ -905,6 +1131,79 @@ if(!res.ok || !data.ok) throw new Error(data.error || "Admin failed");
 return data;
 }
 /* ==============================
+PRETRAGA / TEKST HELPERI
+================================ */
+function normalizeSearch(s){
+return String(s || "")
+.toLowerCase()
+.replaceAll("š","s").replaceAll("đ","dj").replaceAll("č","c").replaceAll("ć","c").replaceAll("ž","z");
+}
+function plainExcerpt(text, len){
+len = len || 155;
+const clean = String(text || "").replace(/\s+/g," ").trim();
+if(!clean) return "";
+if(clean.length <= len) return clean;
+return clean.slice(0, len - 1).trimEnd() + "…";
+}
+/* ==============================
+SEO META (dinamični title / og / twitter tagovi)
+================================ */
+const DEFAULT_TITLE = "FK Rudar Kostolac";
+const DEFAULT_DESC = "FK Rudar Kostolac | Zvanična klupska stranica";
+const DEFAULT_IMG = "assets/img/rudar_logo_transparent.png";
+function absUrl(path){
+try{ return new URL(path, window.location.origin).href; }catch(e){ return path; }
+}
+function setMeta(opts){
+const title = opts.title || DEFAULT_TITLE;
+const desc = opts.desc || DEFAULT_DESC;
+const image = absUrl(opts.image || DEFAULT_IMG);
+const url = absUrl(opts.url || "/");
+document.getElementById("metaTitleTag").textContent = title;
+document.getElementById("metaDescTag").setAttribute("content", desc);
+document.getElementById("ogTitleTag").setAttribute("content", title);
+document.getElementById("ogDescTag").setAttribute("content", desc);
+document.getElementById("ogImageTag").setAttribute("content", image);
+document.getElementById("ogUrlTag").setAttribute("content", url);
+document.getElementById("twTitleTag").setAttribute("content", title);
+document.getElementById("twDescTag").setAttribute("content", desc);
+document.getElementById("twImageTag").setAttribute("content", image);
+}
+function resetMeta(){
+setMeta({title: DEFAULT_TITLE, desc: DEFAULT_DESC, image: DEFAULT_IMG, url: "/"});
+}
+/* ==============================
+TOP LOADER
+================================ */
+const topLoaderEl = document.getElementById("topLoader");
+function loaderStart(){
+topLoaderEl.classList.remove("done");
+topLoaderEl.style.width = "0%";
+requestAnimationFrame(()=>{ topLoaderEl.style.width = "78%"; });
+}
+function loaderDone(){
+topLoaderEl.style.width = "100%";
+setTimeout(()=>{
+topLoaderEl.classList.add("done");
+setTimeout(()=>{ topLoaderEl.style.width = "0%"; }, 400);
+}, 200);
+}
+/* ==============================
+TOAST
+================================ */
+const toastEl = document.getElementById("toast");
+let toastTimer = null;
+function showToast(html, onClick){
+toastEl.innerHTML = `<span class="dot">🔔</span><span>${html}</span>`;
+toastEl.onclick = () => { if(onClick) onClick(); toastEl.classList.remove("show"); };
+toastEl.classList.add("show");
+clearTimeout(toastTimer);
+toastTimer = setTimeout(()=> toastEl.classList.remove("show"), 6000);
+}
+function emptyState(text){
+return `<div class="empty-state">${text || "Trenutno nema podataka."}</div>`;
+}
+/* ==============================
 NAV / VIEWS
 ================================ */
 const views = ["viewHome","viewSchedule","viewNews","viewTeam","viewHistory","viewContact"];
@@ -913,6 +1212,12 @@ views.forEach(v=>{
 const el = document.getElementById(v);
 if(el) el.classList.toggle("active", v === id);
 });
+if(id !== "viewNews"){
+if(window.location.pathname.indexOf("/vest/") === 0){
+history.replaceState({}, "", "/");
+}
+resetMeta();
+}
 window.scrollTo({top:0, behavior:"smooth"});
 }
 /* Logo -> Početna */
@@ -951,14 +1256,17 @@ if(norm(home) === club) return {t:"KOD KUĆE", cls:"home"};
 if(norm(away) === club) return {t:"GOSTI", cls:""};
 return {t:"", cls:""};
 }
-function matchCard(m){
+function isPlayed(m){
+return !!m && m.home_score !== null && m.home_score !== undefined && m.away_score !== null && m.away_score !== undefined && String(m.home_score) !== "" && String(m.away_score) !== "";
+}
+function matchCard(m, idx){
 const date = formatDateISO(m.match_date);
 const time = m.match_time || "";
 const b = matchBadge(m.home_team, m.away_team);
 const small = [time, (m.competition||"Zona Dunav")].filter(Boolean).join(" • ");
 const tagText = b.t || (m.round || "");
 return `
-<div class="match">
+<div class="match fade-item" style="animation-delay:${Math.min(idx||0,8)*45}ms">
 <div class="when">
 <b>${date || "Datum uskoro"}</b>
 <span>${small}</span>
@@ -972,9 +1280,32 @@ return `
 </div>
 `;
 }
-function renderTicker(matches){
+function resultCard(m, idx){
+const date = formatDateISO(m.match_date);
+const b = matchBadge(m.home_team, m.away_team);
+const tagText = b.t || (m.round || "");
+return `
+<div class="match result fade-item" style="animation-delay:${Math.min(idx||0,8)*45}ms" onclick="openMatchReport('${String(m.id)}')">
+<div class="when">
+<b>${date || ""}</b>
+<span>${m.competition || "Zona Dunav"}</span>
+</div>
+<div class="vs">
+<div class="club"><div class="n">${displayClubName(m.home_team)}</div></div>
+<div class="score"><span>${m.home_score}</span><span class="sep">:</span><span>${m.away_score}</span></div>
+<div class="club" style="justify-content:flex-end"><div class="n">${displayClubName(m.away_team)}</div></div>
+</div>
+<div class="tag ${b.cls}">${tagText}</div>
+</div>
+`;
+}
+function renderTicker(upcoming){
 const holder = document.getElementById("tickerMove");
-const items = (matches||[]).slice(0,10);
+const items = (upcoming||[]).slice(0,10);
+if(!items.length){
+holder.innerHTML = `<span class="tick"><small>Trenutno</small><strong>nema podataka</strong></span>`;
+return;
+}
 const html = items.map(m=>{
 const date = formatDateISO(m.match_date) || "Uskoro";
 const time = m.match_time || "";
@@ -988,8 +1319,17 @@ return `
 </span>
 `;
 }).join("");
-checkUrlNews();
 holder.innerHTML = html + html;
+}
+let __MATCHES_CACHE__ = [];
+function renderMatches(allMatches){
+__MATCHES_CACHE__ = allMatches || [];
+const upcoming = __MATCHES_CACHE__.filter(m=>!isPlayed(m)).sort(sortMatches);
+const results = __MATCHES_CACHE__.filter(isPlayed).sort((a,b)=>sortMatches(b,a));
+renderTicker(upcoming);
+document.getElementById("nextMatches").innerHTML = upcoming.slice(0,3).map(matchCard).join("") || emptyState();
+document.getElementById("upcomingMatches").innerHTML = upcoming.map(matchCard).join("") || emptyState();
+document.getElementById("resultMatches").innerHTML = results.map(resultCard).join("") || emptyState();
 }
 /* ==============================
 TABLE
@@ -997,7 +1337,7 @@ TABLE
 function tableRow(pos, row){
 const isClub = sameTeam(row.team, CLUB_NAME);
 return `
-<tr class="${isClub ? "highlight" : ""}">
+<tr class="fade-item ${isClub ? "highlight" : ""}" style="animation-delay:${Math.min(pos-1,8)*30}ms">
 <td class="pos">${pos}</td>
 <td>${row.team}</td>
 <td>${row.played}</td>
@@ -1015,7 +1355,7 @@ return `
 NEWS
 ================================ */
 function renderHomeNews(n){
-  document.getElementById("homeNewsTitle").textContent = n?.title || "Nema vesti";
+  document.getElementById("homeNewsTitle").textContent = n?.title || "Trenutno nema podataka.";
   document.getElementById("homeNewsDate").textContent = n?.created_at ? new Date(n.created_at).toLocaleString("sr-RS") : "";
   const img = document.getElementById("homeNewsImg");
   const src = String(n?.image_url || "").trim();
@@ -1026,7 +1366,7 @@ function renderHomeNews(n){
     img.style.display = "none";
   }
   const body = String(n?.body || "").trim();
-  document.getElementById("homeNewsBody").innerHTML = body ? body.split("\n").slice(0,6).join("<br>") : "Nema teksta.";
+  document.getElementById("homeNewsBody").innerHTML = body ? body.split("\n").slice(0,6).join("<br>") : "Trenutno nema podataka.";
 
   // LOGIKA ZA DUGME PROČITAJ VIŠE
   const readBtn = document.getElementById("homeNewsReadBtn");
@@ -1038,6 +1378,8 @@ function renderHomeNews(n){
   }
 }
 let __NEWS_CACHE__ = [];
+let __NEWS_SEARCH_Q__ = "";
+let __LAST_NEWS_IDS__ = new Set();
 function escapeHtml(s){
 return String(s || "")
 .replaceAll("&","&amp;")
@@ -1046,29 +1388,51 @@ return String(s || "")
 .replaceAll('"',"&quot;")
 .replaceAll("'","&#39;");
 }
-function renderNews(list){
+function renderNewsList(){
 const host = document.getElementById("newsList");
 if(!host) return;
-__NEWS_CACHE__ = list || [];
-const detail = document.getElementById("newsDetail");
-if(detail) detail.style.display = "none";
-host.style.display = "block";
 if(!__NEWS_CACHE__.length){
-host.innerHTML = `<div class="hint">Nema vesti.</div>`;
+host.innerHTML = emptyState();
 return;
 }
-host.innerHTML = __NEWS_CACHE__.map(n => `
-  <div class="news-item">
+let list = __NEWS_CACHE__;
+if(__NEWS_SEARCH_Q__.trim()){
+const q = normalizeSearch(__NEWS_SEARCH_Q__);
+list = list.filter(n => normalizeSearch(n.title || "").includes(q));
+}
+if(!list.length){
+host.innerHTML = `<div class="empty-state">Nema vesti koje odgovaraju pretrazi „${escapeHtml(__NEWS_SEARCH_Q__)}“.</div>`;
+return;
+}
+host.innerHTML = list.map((n, i) => `
+  <div class="news-item fade-item" style="animation-delay:${Math.min(i,8)*45}ms">
     <h3>${escapeHtml(n.title || "Bez naslova")}</h3>
     <div class="meta"><span>${n.created_at ? new Date(n.created_at).toLocaleDateString("sr-RS") : ""}</span></div>
-    <button class="news-read-btn" onclick="openNews('${String(n.id)}')">Pročitaj više →</button>
+    <button class="news-read-btn" onclick="openNews('${String(n.id)}')">Pročitaj više <span class="arrow">→</span></button>
   </div>
 `).join("");
 }
-function openNews(id) {
+const newsSearchInput = document.getElementById("newsSearchInput");
+if(newsSearchInput){
+newsSearchInput.addEventListener("input", (e)=>{
+__NEWS_SEARCH_Q__ = e.target.value || "";
+renderNewsList();
+});
+}
+function getNewsIdFromUrl(){
+const path = window.location.pathname || "";
+const m = path.match(/\/vest\/([^\/?#]+)/);
+if(m) return decodeURIComponent(m[1]);
+const params = new URLSearchParams(window.location.search);
+return params.get("news");
+}
+function openNews(id, opts) {
+    opts = opts || {};
     const one = __NEWS_CACHE__.find(n => String(n.id) === String(id));
     if (!one) return;
     showView("viewNews");
+    const searchWrap = document.getElementById("newsSearchWrap");
+    if(searchWrap) searchWrap.style.display = "none";
     document.getElementById("newsList").style.display = "none";
     document.getElementById("newsDetail").style.display = "block";
     document.getElementById("newsDetailTitle").innerText = one.title || "Bez naslova";
@@ -1088,21 +1452,64 @@ function openNews(id) {
         const body = String(one.body || "").trim();
         bodyEl.innerHTML = body ? escapeHtml(body).replace(/\n/g, "<br>") : "Nema sadržaja.";
     }
-    // VAŽNO: ažuriramo URL bez reload-a
-    history.pushState({}, "", "?news=" + id);
+    setMeta({
+      title: `${one.title || "Vest"} | FK Rudar Kostolac`,
+      desc: plainExcerpt(one.body, 160) || DEFAULT_DESC,
+      image: one.image_url || DEFAULT_IMG,
+      url: "/vest/" + encodeURIComponent(id)
+    });
+    // VAŽNO: ažuriramo URL bez reload-a (lepši /vest/ID format)
+    if(opts.updateUrl !== false){
+      history.pushState({newsId:id}, "", "/vest/" + encodeURIComponent(id));
+    }
+    window.scrollTo({top:0, behavior:"smooth"});
 }
-function backToNews() {
+function backToNews(opts) {
+    opts = opts || {};
     document.getElementById("newsDetail").style.display = "none";
     document.getElementById("newsList").style.display = "block";
-    // Vraćamo URL na listu
-    history.pushState({}, "", window.location.pathname);
+    const searchWrap = document.getElementById("newsSearchWrap");
+    if(searchWrap) searchWrap.style.display = "block";
+    resetMeta();
+    if(opts.updateUrl !== false){
+      history.pushState({}, "", "/");
+    }
 }
 function checkUrlNews(){
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("news");
-  if(id){
-    openNews(id);
+  const id = getNewsIdFromUrl();
+  if(!id) return;
+  openNews(id, {updateUrl:false});
+  // stara ?news= veza se tiho unapređuje na /vest/ID (bez novog koraka u history-ju)
+  if(window.location.pathname.indexOf("/vest/") !== 0){
+    history.replaceState({newsId:id}, "", "/vest/" + encodeURIComponent(id));
   }
+}
+window.addEventListener("popstate", ()=>{
+  const id = getNewsIdFromUrl();
+  if(id){
+    openNews(id, {updateUrl:false});
+  } else if(document.getElementById("newsDetail").style.display !== "none"){
+    backToNews({updateUrl:false});
+  }
+});
+const newsShareBtn = document.getElementById("newsShareBtn");
+if(newsShareBtn){
+newsShareBtn.addEventListener("click", async ()=>{
+const url = window.location.origin + window.location.pathname;
+const title = document.getElementById("newsDetailTitle").innerText || "FK Rudar Kostolac";
+if(navigator.share){
+try{ await navigator.share({title, url}); }catch(e){ /* korisnik otkazao */ }
+} else if(navigator.clipboard){
+try{
+await navigator.clipboard.writeText(url);
+showToast("Link kopiran ✅");
+}catch(e){
+showToast("Kopiranje nije uspelo. Link: " + url);
+}
+} else {
+showToast(url);
+}
+});
 }
 /* ==============================
 TEAM
@@ -1112,6 +1519,10 @@ const host = document.getElementById("teamGroups");
 const order = ["golmani","odbrana","sredina","napad"];
 const label = {golmani:"Golmani", odbrana:"Odbrana", sredina:"Sredina", napad:"Napad"};
 host.innerHTML = "";
+if(!players || !players.length){
+host.innerHTML = emptyState();
+return;
+}
 order.forEach((pos, idx)=>{
 const group = (players||[])
 .filter(p=>p.position_group===pos)
@@ -1129,6 +1540,9 @@ det.innerHTML = `
 <div class="players"></div>
 `;
 const grid = det.querySelector(".players");
+if(!group.length){
+grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">Trenutno nema podataka.</div>`;
+}
 group.forEach(p=>{
 const paths = playerImgByRule(p.full_name, p.number);
 const img = document.createElement("img");
@@ -1161,24 +1575,38 @@ const da = a.match_date ? new Date(a.match_date).getTime() : 9e15;
 const db = b.match_date ? new Date(b.match_date).getTime() : 9e15;
 return da - db;
 }
-async function loadAll(){
+function showSkeletons(){
+const matchSkel = `<div class="skeleton sk-match"></div><div class="skeleton sk-match"></div><div class="skeleton sk-match"></div>`;
+document.getElementById("nextMatches").innerHTML = matchSkel;
+document.getElementById("upcomingMatches").innerHTML = matchSkel;
+document.getElementById("resultMatches").innerHTML = `<div class="skeleton sk-match"></div><div class="skeleton sk-match"></div>`;
+document.getElementById("newsList").innerHTML = `<div class="skeleton sk-news"></div><div class="skeleton sk-news"></div><div class="skeleton sk-news"></div>`;
+document.getElementById("homeNewsBody").innerHTML = `<div class="skeleton sk-line"></div><div class="skeleton sk-line w60"></div>`;
+document.getElementById("teamGroups").innerHTML = matchSkel;
+document.getElementById("tableBody").innerHTML =
+Array.from({length:6}).map(()=>`<tr><td colspan="10" style="padding:8px 10px"><div class="skeleton sk-row"></div></td></tr>`).join("");
+}
+async function loadAll(isInitial){
+if(isInitial){
+showSkeletons();
+loaderStart();
+}
 // istorija statički
 document.getElementById("historyText").innerHTML = HISTORY_TEXT.replace(/\n/g,"<br>");
+try{
 const [news, matches, players, tableRows] = await Promise.all([
 supaGet("/rest/v1/news?select=*&order=created_at.desc"),
 supaGet("/rest/v1/matches?select=*"),
 supaGet("/rest/v1/players?select=*"),
 supaGet("/rest/v1/table_rows?select=*")
 ]);
-(matches||[]).sort(sortMatches);
-renderTicker(matches||[]);
-document.getElementById("nextMatches").innerHTML =
-(matches||[]).slice(0,3).map(matchCard).join("") || `<div class="hint">Dodaj utakmice u Adminu.</div>`;
-document.getElementById("allMatches").innerHTML =
-(matches||[]).map(matchCard).join("") || `<div class="hint">Dodaj utakmice u Adminu.</div>`;
-renderNews(news||[]);
-renderHomeNews((news||[])[0]);
+__NEWS_CACHE__ = news || [];
+__LAST_NEWS_IDS__ = new Set(__NEWS_CACHE__.map(n=>String(n.id)));
+renderMatches(matches || []);
+renderNewsList();
+renderHomeNews(__NEWS_CACHE__[0]);
 renderTeam(players||[]);
+renderAdminLists();
 const sorted = [...(tableRows||[])].sort((a,b)=>{
 if (b.points !== a.points) return b.points - a.points;
 if (b.goal_diff !== a.goal_diff) return b.goal_diff - a.goal_diff;
@@ -1186,12 +1614,47 @@ return b.goals_for - a.goals_for;
 });
 document.getElementById("tableBody").innerHTML =
 sorted.map((r,i)=>tableRow(i+1, r)).join("") ||
-`<tr><td colspan="10" style="padding:14px;color:var(--muted)">Tabela prazna. Uvezi u Adminu.</td></tr>`;
+`<tr><td colspan="10" style="padding:14px">${emptyState()}</td></tr>`;
 const note = document.getElementById("tableNote");
 const one = sorted[0];
-note.textContent = one ? `Sezona: ${one.season || "2025/2026"} • Kolo: ${one.round || ""}` : "Uvezi tabelu u Adminu.";
-checkUrlNews();
+note.textContent = one ? `Sezona: ${one.season || "2025/2026"} • Kolo: ${one.round || ""}` : "Trenutno nema podataka.";
+if(isInitial) checkUrlNews();
+} finally {
+if(isInitial) loaderDone();
 }
+}
+/* ==============================
+AUTOMATSKO UČITAVANJE NOVIH VESTI (polling, bez reload-a)
+================================ */
+async function pollNews(){
+if(document.hidden) return;
+try{
+const news = await supaGet("/rest/v1/news?select=*&order=created_at.desc");
+const list = news || [];
+const ids = new Set(list.map(n=>String(n.id)));
+let hasNew = false;
+ids.forEach(id=>{ if(!__LAST_NEWS_IDS__.has(id)) hasNew = true; });
+__LAST_NEWS_IDS__ = ids;
+__NEWS_CACHE__ = list;
+renderNewsList();
+renderHomeNews(__NEWS_CACHE__[0]);
+renderAdminLists();
+if(hasNew){
+const latest = list[0];
+if(latest) showToast(`Nova vest: ${escapeHtml(latest.title || "")}`, ()=> openNews(latest.id));
+}
+}catch(e){
+// tiho ignorišemo - probaćemo opet na sledećem intervalu
+}
+}
+let pollTimer = null;
+function startPolling(){
+if(pollTimer) clearInterval(pollTimer);
+pollTimer = setInterval(pollNews, 30000);
+}
+document.addEventListener("visibilitychange", ()=>{
+if(!document.hidden) pollNews();
+});
 /* ==============================
 ADMIN MODAL
 ================================ */
@@ -1213,6 +1676,167 @@ adminModal.setAttribute("aria-hidden","true");
 adminMenuBtn.addEventListener("click", openAdmin);
 adminClose.addEventListener("click", closeAdmin);
 adminModal.addEventListener("click", (e)=>{ if(e.target === adminModal) closeAdmin(); });
+/* ==============================
+ADMIN: LISTE POSTOJEĆIH VESTI/UTAKMICA (izmena / brisanje)
+================================ */
+function renderAdminLists(){
+const newsHost = document.getElementById("adminNewsList");
+if(newsHost){
+newsHost.innerHTML = __NEWS_CACHE__.length
+? __NEWS_CACHE__.map(n=>`
+<div class="admin-list-item">
+<span class="ai-title">${escapeHtml(n.title || "Bez naslova")}</span>
+<span class="admin-list-actions">
+<button type="button" class="admin-mini-btn" onclick="startEditNews('${String(n.id)}')">Izmeni</button>
+<button type="button" class="admin-mini-btn danger" onclick="deleteNewsItem('${String(n.id)}')">Obriši</button>
+</span>
+</div>
+`).join("")
+: emptyState();
+}
+const matchHost = document.getElementById("adminMatchesList");
+if(matchHost){
+const sortedM = [...__MATCHES_CACHE__].sort((a,b)=>sortMatches(b,a));
+matchHost.innerHTML = sortedM.length
+? sortedM.map(m=>{
+const scoreTxt = isPlayed(m) ? ` (${m.home_score}:${m.away_score})` : "";
+const lbl = `${formatDateISO(m.match_date)||"?"} • ${displayClubName(m.home_team)} - ${displayClubName(m.away_team)}${scoreTxt}`;
+return `
+<div class="admin-list-item">
+<span class="ai-title">${escapeHtml(lbl)}</span>
+<span class="admin-list-actions">
+<button type="button" class="admin-mini-btn" onclick="startEditMatch('${String(m.id)}')">Izmeni</button>
+<button type="button" class="admin-mini-btn danger" onclick="deleteMatchItem('${String(m.id)}')">Obriši</button>
+</span>
+</div>
+`;
+}).join("")
+: emptyState();
+}
+}
+let editingNewsId = null;
+function startEditNews(id){
+const n = __NEWS_CACHE__.find(x=>String(x.id)===String(id));
+if(!n) return;
+editingNewsId = id;
+document.getElementById("nTitle").value = n.title || "";
+document.getElementById("nImage").value = n.image_url || "";
+document.getElementById("nBody").value = n.body || "";
+document.getElementById("newsEditingBanner").style.display = "flex";
+document.getElementById("newsEditingLabel").textContent = n.title || "";
+document.getElementById("addNewsBtn").textContent = "Sačuvaj izmene";
+document.getElementById("newsEditingBanner").scrollIntoView({behavior:"smooth", block:"center"});
+}
+function cancelEditNews(){
+editingNewsId = null;
+["nTitle","nImage","nBody"].forEach(id=>{ const el = document.getElementById(id); if(el) el.value = ""; });
+document.getElementById("newsEditingBanner").style.display = "none";
+document.getElementById("addNewsBtn").textContent = "Dodaj vest";
+}
+async function deleteNewsItem(id){
+if(!unlocked) return alert("Unesi PIN.");
+if(!confirm("Obrisati ovu vest?")) return;
+const pin = String(document.getElementById("pinInput").value || "").trim();
+try{
+await adminPost({ pin, action:"delete_news", id });
+if(editingNewsId === id) cancelEditNews();
+await loadAll(false);
+}catch(e){
+alert(String(e.message || e));
+}
+}
+let editingMatchId = null;
+function startEditMatch(id){
+const m = __MATCHES_CACHE__.find(x=>String(x.id)===String(id));
+if(!m) return;
+editingMatchId = id;
+document.getElementById("mDate").value = m.match_date || "";
+document.getElementById("mTime").value = m.match_time || "";
+document.getElementById("mHome").value = m.home_team || "";
+document.getElementById("mAway").value = m.away_team || "";
+document.getElementById("mComp").value = m.competition || "";
+document.getElementById("mRound").value = m.round || "";
+document.getElementById("mVenue").value = m.venue || "";
+document.getElementById("mHomeScore").value = (m.home_score===null||m.home_score===undefined) ? "" : m.home_score;
+document.getElementById("mAwayScore").value = (m.away_score===null||m.away_score===undefined) ? "" : m.away_score;
+document.getElementById("mScorers").value = m.scorers || "";
+document.getElementById("mReport").value = m.report || "";
+document.getElementById("mReportImages").value = m.report_images || "";
+document.getElementById("matchEditingBanner").style.display = "flex";
+document.getElementById("matchEditingLabel").textContent = `${displayClubName(m.home_team)} - ${displayClubName(m.away_team)}`;
+document.getElementById("addMatchBtn").textContent = "Sačuvaj izmene";
+document.getElementById("matchEditingBanner").scrollIntoView({behavior:"smooth", block:"center"});
+}
+function cancelEditMatch(){
+editingMatchId = null;
+["mDate","mTime","mHome","mAway","mComp","mRound","mVenue","mHomeScore","mAwayScore","mScorers","mReport","mReportImages"].forEach(id=>{
+const el = document.getElementById(id);
+if(el) el.value = "";
+});
+document.getElementById("matchEditingBanner").style.display = "none";
+document.getElementById("addMatchBtn").textContent = "Dodaj utakmicu";
+}
+async function deleteMatchItem(id){
+if(!unlocked) return alert("Unesi PIN.");
+if(!confirm("Obrisati ovu utakmicu?")) return;
+const pin = String(document.getElementById("pinInput").value || "").trim();
+try{
+await adminPost({ pin, action:"delete_match", id });
+if(editingMatchId === id) cancelEditMatch();
+await loadAll(false);
+}catch(e){
+alert(String(e.message || e));
+}
+}
+document.getElementById("newsEditingCancel").addEventListener("click", cancelEditNews);
+document.getElementById("matchEditingCancel").addEventListener("click", cancelEditMatch);
+/* ==============================
+IZVEŠTAJ SA UTAKMICE (modal)
+================================ */
+const reportModal = document.getElementById("reportModal");
+function openMatchReport(id){
+const m = (__MATCHES_CACHE__||[]).find(x=>String(x.id)===String(id));
+if(!m) return;
+const date = formatDateISO(m.match_date);
+document.getElementById("reportMeta").innerHTML =
+`<span>${date||""}</span><span>${escapeHtml(m.competition||"Zona Dunav")}</span>${m.venue?`<span>${escapeHtml(m.venue)}</span>`:""}`;
+document.getElementById("reportScoreBox").innerHTML = `
+<div class="team">${displayClubName(m.home_team)}</div>
+<div class="big">${m.home_score} : ${m.away_score}</div>
+<div class="team">${displayClubName(m.away_team)}</div>
+`;
+const scorersWrap = document.getElementById("reportScorersWrap");
+const scorersHost = document.getElementById("reportScorers");
+const scorersRaw = String(m.scorers||"").trim();
+if(scorersRaw){
+const lines = scorersRaw.split(/\n|,/).map(s=>s.trim()).filter(Boolean);
+scorersHost.innerHTML = lines.map(s=>`<div class="scorer-row">⚽ ${escapeHtml(s)}</div>`).join("");
+scorersWrap.style.display = "block";
+} else {
+scorersWrap.style.display = "none";
+}
+const reportWrap = document.getElementById("reportTextWrap");
+const reportText = document.getElementById("reportText");
+const rep = String(m.report||"").trim();
+if(rep){
+reportText.innerHTML = escapeHtml(rep).replace(/\n/g,"<br>");
+reportWrap.style.display = "block";
+} else {
+reportWrap.style.display = "none";
+}
+const gallery = document.getElementById("reportGallery");
+const imgs = String(m.report_images||"").split(/\n|,/).map(s=>s.trim()).filter(Boolean);
+gallery.innerHTML = imgs.map(u=>`<img src="${escapeHtml(u)}" alt="" loading="lazy">`).join("");
+gallery.style.display = imgs.length ? "grid" : "none";
+reportModal.classList.add("open");
+reportModal.setAttribute("aria-hidden","false");
+}
+function closeMatchReport(){
+reportModal.classList.remove("open");
+reportModal.setAttribute("aria-hidden","true");
+}
+document.getElementById("reportClose").addEventListener("click", closeMatchReport);
+reportModal.addEventListener("click", (e)=>{ if(e.target === reportModal) closeMatchReport(); });
 let unlocked = false;
 function setUnlocked(v){
 unlocked = v;
@@ -1267,22 +1891,56 @@ if(!unlocked) return alert("Unesi PIN.");
 const pin = String(document.getElementById("pinInput").value || "").trim();
 const payload = {
 pin,
-action: "add_news",
+action: editingNewsId ? "update_news" : "add_news",
 title: String(document.getElementById("nTitle").value||"").trim(),
 image_url: String(document.getElementById("nImage").value||"").trim(),
 body: String(document.getElementById("nBody").value||"").trim()
 };
+if(editingNewsId) payload.id = editingNewsId;
 if(!payload.title || !payload.body) return alert("Popuni naslov i tekst.");
+const wasEditing = !!editingNewsId;
 await adminPost(payload);
-await loadAll();
-alert("Vest dodata.");
+cancelEditNews();
+await loadAll(false);
+alert(wasEditing ? "Vest izmenjena." : "Vest dodata.");
+});
+document.getElementById("uploadMatchImgBtn").addEventListener("click", async ()=>{
+if(!unlocked) return alert("Unesi PIN.");
+const pin = String(document.getElementById("pinInput").value || "").trim();
+const f = document.getElementById("matchFile").files?.[0];
+if(!f) return alert("Izaberi sliku.");
+const hint = document.getElementById("uploadMatchHint");
+hint.textContent = "Upload...";
+const reader = new FileReader();
+reader.onload = async () => {
+try{
+const dataUrl = String(reader.result || "");
+const base64 = dataUrl.split(",")[1] || "";
+const resp = await adminPost({
+pin,
+action: "upload_media",
+filename: f.name,
+contentType: f.type || "image/jpeg",
+base64
+});
+const ta = document.getElementById("mReportImages");
+ta.value = ta.value.trim() ? ta.value.trim() + "\n" + resp.url : resp.url;
+hint.textContent = "Upload OK. Link dodat.";
+}catch(e){
+hint.textContent = "Upload error.";
+alert(String(e.message || e));
+}
+};
+reader.readAsDataURL(f);
 });
 document.getElementById("addMatchBtn").addEventListener("click", async ()=>{
 if(!unlocked) return alert("Unesi PIN.");
 const pin = String(document.getElementById("pinInput").value || "").trim();
+const hsRaw = String(document.getElementById("mHomeScore").value||"").trim();
+const asRaw = String(document.getElementById("mAwayScore").value||"").trim();
 const payload = {
 pin,
-action: "add_match",
+action: editingMatchId ? "update_match" : "add_match",
 competition: String(document.getElementById("mComp").value||"").trim() || "Zona Dunav",
 match_date: String(document.getElementById("mDate").value||"").trim(),
 match_time: String(document.getElementById("mTime").value||"").trim(),
@@ -1290,12 +1948,20 @@ home_team: String(document.getElementById("mHome").value||"").trim(),
 away_team: String(document.getElementById("mAway").value||"").trim(),
 venue: String(document.getElementById("mVenue").value||"").trim(),
 round: String(document.getElementById("mRound").value||"").trim(),
+home_score: hsRaw === "" ? null : parseInt(hsRaw,10),
+away_score: asRaw === "" ? null : parseInt(asRaw,10),
+scorers: String(document.getElementById("mScorers").value||"").trim(),
+report: String(document.getElementById("mReport").value||"").trim(),
+report_images: String(document.getElementById("mReportImages").value||"").trim(),
 status: "scheduled"
 };
+if(editingMatchId) payload.id = editingMatchId;
 if(!payload.home_team || !payload.away_team) return alert("Popuni timove.");
+const wasEditing = !!editingMatchId;
 await adminPost(payload);
-await loadAll();
-alert("Utakmica dodata.");
+cancelEditMatch();
+await loadAll(false);
+alert(wasEditing ? "Utakmica izmenjena." : "Utakmica dodata.");
 });
 document.getElementById("addPlayerBtn").addEventListener("click", async ()=>{
 if(!unlocked) return alert("Unesi PIN.");
@@ -1310,7 +1976,7 @@ position_group: String(document.getElementById("pPos").value||"").trim()
 };
 if(!payload.full_name || !payload.number || !payload.position_group) return alert("Popuni polja.");
 await adminPost(payload);
-await loadAll();
+await loadAll(false);
 alert("Igrač dodat.");
 });
 document.getElementById("importTableBtn").addEventListener("click", async ()=>{
@@ -1339,15 +2005,17 @@ points: parseInt(p[8],10)
 }
 if(!rows.length) return alert("Format: Tim;U;P;N;Por;DG;PG;GR;Bod");
 await adminPost({ pin, action:"replace_table", season, round, rows });
-await loadAll();
+await loadAll(false);
 alert("Tabela uvezena.");
 });
 window.addEventListener("load", async () => {
     try {
-        await loadAll();
+        await loadAll(true);
     } catch (e) {
+        loaderDone();
         alert(String(e.message || e));
     }
+    startPolling();
 });
 </script>
 </body>
