@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /*?news=
+
+Sitemap: https://fkrudarkostolac.com/sitemap.xml

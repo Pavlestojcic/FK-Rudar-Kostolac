@@ -6,6 +6,7 @@
 <title id="metaTitleTag">FK Rudar Kostolac</title>
 <meta id="metaDescTag" name="description" content="FK Rudar Kostolac | Zvanična klupska stranica" />
 <link rel="icon" type="image/png" href="assets/img/rudar_logo_transparent.png">
+<link rel="canonical" href="/" id="canonicalTag" />
 <meta property="og:type" content="website" id="ogTypeTag" />
 <meta property="og:site_name" content="FK Rudar Kostolac" />
 <meta property="og:title" content="FK Rudar Kostolac" id="ogTitleTag" />
@@ -736,7 +737,7 @@ animation: pulseNew 1.6s ease infinite;
 <div class="news-item" style="margin-top:10px">
 <h3 id="homeNewsTitle"></h3>
 <div class="meta"><span id="homeNewsDate"></span></div>
-<img id="homeNewsImg" class="news-img" style="display:none" alt="" />
+<img id="homeNewsImg" class="news-img" style="display:none" alt="" loading="lazy" />
 <p id="homeNewsBody"></p>
 <button id="homeNewsReadBtn" class="news-read-btn" style="display:none;">Pročitaj više <span class="arrow">→</span></button>
 </div>
@@ -745,7 +746,7 @@ animation: pulseNew 1.6s ease infinite;
 <div style="margin-top:16px">
 <div class="section-head">
 <h2>Tabela</h2>
-<p>Zona Dunav</p>
+<p>Zona Dunav • Top 5</p>
 </div>
 <div class="card table-card">
 <div class="table-wrap">
@@ -768,6 +769,7 @@ animation: pulseNew 1.6s ease infinite;
 </table>
 </div>
 <div class="hint" id="tableNote"></div>
+<button class="news-read-btn" style="margin-top:12px" onclick="showView('viewTable')">Cela tabela <span class="arrow">→</span></button>
 </div>
 </div>
 </section>
@@ -779,12 +781,42 @@ animation: pulseNew 1.6s ease infinite;
 </div>
 <div class="match-list" id="upcomingMatches"></div>
 </div>
-<div class="card view-pad" style="margin-top:16px">
+</section>
+<section class="view" id="viewResults">
+<div class="card view-pad">
 <div class="section-head" style="margin:0 0 10px">
 <h2>Rezultati</h2>
 <p>Klikni na utakmicu za izveštaj</p>
 </div>
 <div class="match-list" id="resultMatches"></div>
+</div>
+</section>
+<section class="view" id="viewTable">
+<div class="card view-pad">
+<div class="section-head" style="margin:0 0 10px">
+<h2>Tabela</h2>
+<p>Zona Dunav • Kompletan poredak</p>
+</div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th class="pos">Poz</th>
+<th>Tim</th>
+<th>U</th>
+<th>P</th>
+<th>N</th>
+<th>Por</th>
+<th>DG</th>
+<th>PG</th>
+<th>GR</th>
+<th>Bod</th>
+</tr>
+</thead>
+<tbody id="tableBodyFull"></tbody>
+</table>
+</div>
+<div class="hint" id="tableNoteFull"></div>
 </div>
 </section>
 <section class="view" id="viewNews">
@@ -805,7 +837,7 @@ animation: pulseNew 1.6s ease infinite;
   </div>
   <h2 id="newsDetailTitle"></h2>
   <div class="meta"><span id="newsDetailDate"></span></div>
-  <img id="newsDetailImg" class="news-img" style="display:none;" alt="">
+  <img id="newsDetailImg" class="news-img" style="display:none;" alt="" loading="lazy">
   <div id="newsDetailBody"></div>
 </div>
 </div>
@@ -886,6 +918,8 @@ Facebook
 <div class="drawer-links" id="drawerLinks">
 <button data-view="viewHome">Početna <span></span></button>
 <button data-view="viewSchedule">Raspored <span>utakmice</span></button>
+<button data-view="viewResults">Rezultati <span>odigrano</span></button>
+<button data-view="viewTable">Tabela <span>poredak</span></button>
 <button data-view="viewNews">Vesti <span>objave</span></button>
 <button data-view="viewTeam">Tim <span>igrači</span></button>
 <button data-view="viewHistory">Istorija <span></span></button>
@@ -1145,6 +1179,22 @@ if(!clean) return "";
 if(clean.length <= len) return clean;
 return clean.slice(0, len - 1).trimEnd() + "…";
 }
+function firstSentences(text, count, maxLen){
+count = count || 2;
+maxLen = maxLen || 220;
+const clean = String(text || "").replace(/\s+/g," ").trim();
+if(!clean) return "";
+const parts = clean.match(/[^.!?]+[.!?]*(\s+|$)/g);
+let out;
+if(parts && parts.length){
+out = parts.slice(0, count).join("").trim();
+} else {
+out = clean;
+}
+if(out.length > maxLen) out = out.slice(0, maxLen - 1).trimEnd() + "…";
+else if(parts && parts.length > count) out += " …";
+return out;
+}
 /* ==============================
 SEO META (dinamični title / og / twitter tagovi)
 ================================ */
@@ -1168,6 +1218,8 @@ document.getElementById("ogUrlTag").setAttribute("content", url);
 document.getElementById("twTitleTag").setAttribute("content", title);
 document.getElementById("twDescTag").setAttribute("content", desc);
 document.getElementById("twImageTag").setAttribute("content", image);
+const canon = document.getElementById("canonicalTag");
+if(canon) canon.setAttribute("href", url);
 }
 function resetMeta(){
 setMeta({title: DEFAULT_TITLE, desc: DEFAULT_DESC, image: DEFAULT_IMG, url: "/"});
@@ -1206,7 +1258,7 @@ return `<div class="empty-state">${text || "Trenutno nema podataka."}</div>`;
 /* ==============================
 NAV / VIEWS
 ================================ */
-const views = ["viewHome","viewSchedule","viewNews","viewTeam","viewHistory","viewContact"];
+const views = ["viewHome","viewSchedule","viewResults","viewTable","viewNews","viewTeam","viewHistory","viewContact"];
 function showView(id){
 views.forEach(v=>{
 const el = document.getElementById(v);
@@ -1366,7 +1418,7 @@ function renderHomeNews(n){
     img.style.display = "none";
   }
   const body = String(n?.body || "").trim();
-  document.getElementById("homeNewsBody").innerHTML = body ? body.split("\n").slice(0,6).join("<br>") : "Trenutno nema podataka.";
+  document.getElementById("homeNewsBody").innerHTML = body ? escapeHtml(firstSentences(body, 2)) : "Trenutno nema podataka.";
 
   // LOGIKA ZA DUGME PROČITAJ VIŠE
   const readBtn = document.getElementById("homeNewsReadBtn");
@@ -1498,17 +1550,22 @@ newsShareBtn.addEventListener("click", async ()=>{
 const url = window.location.origin + window.location.pathname;
 const title = document.getElementById("newsDetailTitle").innerText || "FK Rudar Kostolac";
 if(navigator.share){
-try{ await navigator.share({title, url}); }catch(e){ /* korisnik otkazao */ }
-} else if(navigator.clipboard){
+try{
+await navigator.share({title, url});
+return;
+}catch(e){
+if(e && e.name === "AbortError") return; // korisnik otkazao deljenje - to je u redu, ništa dalje
+// bilo koja druga greška (npr. nesiguran kontekst) - padamo na kopiranje ispod
+}
+}
+if(navigator.clipboard && navigator.clipboard.writeText){
 try{
 await navigator.clipboard.writeText(url);
 showToast("Link kopiran ✅");
-}catch(e){
-showToast("Kopiranje nije uspelo. Link: " + url);
+return;
+}catch(e){ /* padamo na prikaz golog linka ispod */ }
 }
-} else {
 showToast(url);
-}
 });
 }
 /* ==============================
@@ -1548,6 +1605,7 @@ const paths = playerImgByRule(p.full_name, p.number);
 const img = document.createElement("img");
 img.src = paths.png;
 img.alt = p.full_name;
+img.loading = "lazy";
 img.onerror = () => { img.onerror=null; img.src = paths.jpg; };
 const el = document.createElement("div");
 el.className = "p";
@@ -1583,8 +1641,20 @@ document.getElementById("resultMatches").innerHTML = `<div class="skeleton sk-ma
 document.getElementById("newsList").innerHTML = `<div class="skeleton sk-news"></div><div class="skeleton sk-news"></div><div class="skeleton sk-news"></div>`;
 document.getElementById("homeNewsBody").innerHTML = `<div class="skeleton sk-line"></div><div class="skeleton sk-line w60"></div>`;
 document.getElementById("teamGroups").innerHTML = matchSkel;
-document.getElementById("tableBody").innerHTML =
-Array.from({length:6}).map(()=>`<tr><td colspan="10" style="padding:8px 10px"><div class="skeleton sk-row"></div></td></tr>`).join("");
+const rowsSkel = Array.from({length:6}).map(()=>`<tr><td colspan="10" style="padding:8px 10px"><div class="skeleton sk-row"></div></td></tr>`).join("");
+document.getElementById("tableBody").innerHTML = rowsSkel;
+const fullBody = document.getElementById("tableBodyFull");
+if(fullBody) fullBody.innerHTML = rowsSkel;
+}
+function paintTable(tbodyId, noteId, sorted){
+const tbody = document.getElementById(tbodyId);
+if(!tbody) return;
+tbody.innerHTML = sorted.map((r,i)=>tableRow(i+1, r)).join("") ||
+`<tr><td colspan="10" style="padding:14px">${emptyState()}</td></tr>`;
+const note = document.getElementById(noteId);
+if(!note) return;
+const one = sorted[0];
+note.textContent = one ? `Sezona: ${one.season || "2025/2026"} • Kolo: ${one.round || ""}` : "Trenutno nema podataka.";
 }
 async function loadAll(isInitial){
 if(isInitial){
@@ -1612,12 +1682,9 @@ if (b.points !== a.points) return b.points - a.points;
 if (b.goal_diff !== a.goal_diff) return b.goal_diff - a.goal_diff;
 return b.goals_for - a.goals_for;
 });
-document.getElementById("tableBody").innerHTML =
-sorted.map((r,i)=>tableRow(i+1, r)).join("") ||
-`<tr><td colspan="10" style="padding:14px">${emptyState()}</td></tr>`;
-const note = document.getElementById("tableNote");
-const one = sorted[0];
-note.textContent = one ? `Sezona: ${one.season || "2025/2026"} • Kolo: ${one.round || ""}` : "Trenutno nema podataka.";
+// isti izvor podataka (table_rows u supabase) puni i kompaktnu tabelu na početnoj i celu stranicu "Tabela"
+paintTable("tableBody", "tableNote", sorted);
+paintTable("tableBodyFull", "tableNoteFull", sorted);
 if(isInitial) checkUrlNews();
 } finally {
 if(isInitial) loaderDone();
@@ -1858,23 +1925,57 @@ document.getElementById("lockBtn").addEventListener("click", ()=>{
 setUnlocked(false);
 document.getElementById("pinInput").value = "";
 });
+function compressImage(file, maxDim, quality){
+maxDim = maxDim || 1600;
+quality = quality || 0.82;
+return new Promise((resolve, reject)=>{
+const isRaster = file.type && file.type.startsWith("image/") && file.type !== "image/gif" && file.type !== "image/svg+xml";
+if(!isRaster){
+// gif/svg/nepoznat tip - ne diramo (kompresija bi pokvarila animaciju/vektor)
+const reader = new FileReader();
+reader.onload = () => {
+const dataUrl = String(reader.result || "");
+resolve({ base64: dataUrl.split(",")[1] || "", contentType: file.type || "image/jpeg" });
+};
+reader.onerror = () => reject(new Error("Slika se ne može pročitati."));
+reader.readAsDataURL(file);
+return;
+}
+const objUrl = URL.createObjectURL(file);
+const img = new Image();
+img.onload = () => {
+let w = img.naturalWidth, h = img.naturalHeight;
+if(w > maxDim || h > maxDim){
+if(w >= h){ h = Math.round(h * (maxDim / w)); w = maxDim; }
+else { w = Math.round(w * (maxDim / h)); h = maxDim; }
+}
+const canvas = document.createElement("canvas");
+canvas.width = w; canvas.height = h;
+const ctx = canvas.getContext("2d");
+ctx.drawImage(img, 0, 0, w, h);
+URL.revokeObjectURL(objUrl);
+const dataUrl = canvas.toDataURL("image/jpeg", quality);
+resolve({ base64: dataUrl.split(",")[1] || "", contentType: "image/jpeg" });
+};
+img.onerror = () => { URL.revokeObjectURL(objUrl); reject(new Error("Slika se ne može učitati.")); };
+img.src = objUrl;
+});
+}
 document.getElementById("uploadNewsImgBtn").addEventListener("click", async ()=>{
 if(!unlocked) return alert("Unesi PIN.");
 const pin = String(document.getElementById("pinInput").value || "").trim();
 const f = document.getElementById("newsFile").files?.[0];
 if(!f) return alert("Izaberi sliku.");
 const hint = document.getElementById("uploadHint");
-hint.textContent = "Upload...";
-const reader = new FileReader();
-reader.onload = async () => {
+hint.textContent = "Sažimanje slike...";
 try{
-const dataUrl = String(reader.result || "");
-const base64 = dataUrl.split(",")[1] || "";
+const { base64, contentType } = await compressImage(f);
+hint.textContent = "Upload...";
 const resp = await adminPost({
 pin,
 action: "upload_media",
 filename: f.name,
-contentType: f.type || "image/jpeg",
+contentType,
 base64
 });
 document.getElementById("nImage").value = resp.url;
@@ -1883,8 +1984,6 @@ hint.textContent = "Upload OK. Link upisan.";
 hint.textContent = "Upload error.";
 alert(String(e.message || e));
 }
-};
-reader.readAsDataURL(f);
 });
 document.getElementById("addNewsBtn").addEventListener("click", async ()=>{
 if(!unlocked) return alert("Unesi PIN.");
@@ -1910,17 +2009,15 @@ const pin = String(document.getElementById("pinInput").value || "").trim();
 const f = document.getElementById("matchFile").files?.[0];
 if(!f) return alert("Izaberi sliku.");
 const hint = document.getElementById("uploadMatchHint");
-hint.textContent = "Upload...";
-const reader = new FileReader();
-reader.onload = async () => {
+hint.textContent = "Sažimanje slike...";
 try{
-const dataUrl = String(reader.result || "");
-const base64 = dataUrl.split(",")[1] || "";
+const { base64, contentType } = await compressImage(f);
+hint.textContent = "Upload...";
 const resp = await adminPost({
 pin,
 action: "upload_media",
 filename: f.name,
-contentType: f.type || "image/jpeg",
+contentType,
 base64
 });
 const ta = document.getElementById("mReportImages");
@@ -1930,8 +2027,6 @@ hint.textContent = "Upload OK. Link dodat.";
 hint.textContent = "Upload error.";
 alert(String(e.message || e));
 }
-};
-reader.readAsDataURL(f);
 });
 document.getElementById("addMatchBtn").addEventListener("click", async ()=>{
 if(!unlocked) return alert("Unesi PIN.");
