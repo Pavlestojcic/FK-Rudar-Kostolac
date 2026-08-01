@@ -26,6 +26,12 @@ String(s || "")
 .replace(/\s+/g, "_")
 .slice(0, 120);
 
+const numOrNull = (v) => {
+if (v === null || v === undefined || v === "") return null;
+const n = Number(v);
+return Number.isFinite(n) ? n : null;
+};
+
 async function supaFetch(path, { method = "GET", body, headers = {} } = {}) {
 const SUPABASE_URL = mustEnv("SUPABASE_URL");
 const SERVICE = mustEnv("SUPABASE_SERVICE_ROLE_KEY");
@@ -148,6 +154,36 @@ body: [{ title, body, image_url }],
 return json(200, { ok: true, data });
 }
 
+// 3b) update_news
+if (action === "update_news") {
+const id = payload.id;
+if (!id) return json(400, { ok: false, error: "Missing id" });
+
+const title = String(payload.title || "").trim();
+const body = String(payload.body || "").trim();
+const image_url = String(payload.image_url || "").trim();
+
+if (!title || !body) return json(400, { ok: false, error: "Missing title/body" });
+
+const data = await supaFetch(`/rest/v1/news?id=eq.${encodeURIComponent(id)}`, {
+method: "PATCH",
+headers: { Prefer: "return=representation" },
+body: { title, body, image_url },
+});
+
+return json(200, { ok: true, data });
+}
+
+// 3c) delete_news
+if (action === "delete_news") {
+const id = payload.id;
+if (!id) return json(400, { ok: false, error: "Missing id" });
+
+await supaFetch(`/rest/v1/news?id=eq.${encodeURIComponent(id)}`, { method: "DELETE" });
+
+return json(200, { ok: true });
+}
+
 // 4) add_match
 if (action === "add_match") {
 const match_date = String(payload.match_date || "").trim(); // YYYY-MM-DD
@@ -166,6 +202,11 @@ away_team,
 venue: String(payload.venue || "").trim(),
 round: String(payload.round || "").trim(),
 status: String(payload.status || "scheduled").trim(),
+home_score: numOrNull(payload.home_score),
+away_score: numOrNull(payload.away_score),
+scorers: String(payload.scorers || "").trim(),
+report: String(payload.report || "").trim(),
+report_images: String(payload.report_images || "").trim(),
 };
 
 const data = await supaFetch("/rest/v1/matches", {
@@ -175,6 +216,50 @@ body: [row],
 });
 
 return json(200, { ok: true, data });
+}
+
+// 4b) update_match
+if (action === "update_match") {
+const id = payload.id;
+if (!id) return json(400, { ok: false, error: "Missing id" });
+
+const home_team = String(payload.home_team || "").trim();
+const away_team = String(payload.away_team || "").trim();
+if (!home_team || !away_team) return json(400, { ok: false, error: "Missing teams" });
+
+const row = {
+competition: String(payload.competition || "Zona Dunav").trim(),
+match_date: String(payload.match_date || "").trim(),
+match_time: String(payload.match_time || "").trim(),
+home_team,
+away_team,
+venue: String(payload.venue || "").trim(),
+round: String(payload.round || "").trim(),
+status: String(payload.status || "scheduled").trim(),
+home_score: numOrNull(payload.home_score),
+away_score: numOrNull(payload.away_score),
+scorers: String(payload.scorers || "").trim(),
+report: String(payload.report || "").trim(),
+report_images: String(payload.report_images || "").trim(),
+};
+
+const data = await supaFetch(`/rest/v1/matches?id=eq.${encodeURIComponent(id)}`, {
+method: "PATCH",
+headers: { Prefer: "return=representation" },
+body: row,
+});
+
+return json(200, { ok: true, data });
+}
+
+// 4c) delete_match
+if (action === "delete_match") {
+const id = payload.id;
+if (!id) return json(400, { ok: false, error: "Missing id" });
+
+await supaFetch(`/rest/v1/matches?id=eq.${encodeURIComponent(id)}`, { method: "DELETE" });
+
+return json(200, { ok: true });
 }
 
 // 5) add_player
